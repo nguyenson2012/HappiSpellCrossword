@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -105,10 +106,9 @@ public class GridviewAdapter extends BaseAdapter {
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        View gridView;
+        final View gridView;
 
         if (convertView == null) {
-            gridView = new View(context);
             // get layout from grid_item.xml ( Defined Below )
             gridView = inflater.inflate(R.layout.grid_puzzle_item, null);
         } else {
@@ -144,6 +144,14 @@ public class GridviewAdapter extends BaseAdapter {
                 cell.setVisibility(View.VISIBLE);
                 cell.setBackgroundResource(R.drawable.ic_action_word);
             }
+            cell.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Animation animationScale = AnimationUtils.loadAnimation(context, R.anim.scale);
+                    gridView.startAnimation(animationScale);
+                }
+            });
+
         }
         return gridView;
     }
