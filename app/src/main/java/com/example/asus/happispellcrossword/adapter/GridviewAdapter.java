@@ -32,59 +32,55 @@ import java.util.ArrayList;
 public class GridviewAdapter extends BaseAdapter {
     public static final String DISABLE = "0";
     public static final String ENABLE = "";
-    public static final int NORMAL = 2;
-    public static final int MAIN_CLICKED = 3;
-    public static final int SUB_CLICKED = 4;
-    public static final int TRANSPARENT = 5;
-    private static int color[][];//The board must be rectangular + data[x][y]
+//    public static final int NORMAL = 2;
+//    public static final int MAIN_CLICKED = 3;
+//    public static final int SUB_CLICKED = 4;
+//    public static final int TRANSPARENT = 5;
+//    private static int color[][];//The board must be rectangular + data[x][y]
     private static boolean isAnimation[][];//The board must be rectangular + data[x][y]
-    private static WordObject clickedOject = null;
+//    private static WordObject clickedOject = null;
     ObjectAnimator scaleAnimationX = new ObjectAnimator();
     ObjectAnimator scaleAnimationY = new ObjectAnimator();
-    //Constructor to resetColor values
     WordObjectsManager objManager = WordObjectsManager.getInstance();
     private Context context;
     private String data[][];//The board must be rectangular + data[x][y]
-    private ArrayList<WordObject> listWord = new ArrayList<WordObject>();
-    private OnItemGridViewClick gridViewClickListener;
+    private int imageLocation[];
+//    private ArrayList<WordObject> listWord = new ArrayList<WordObject>();
+//    private OnItemGridViewClick gridViewClickListener;
     private Animation animation;
     private DisplayImageOptions opt;
 
     public GridviewAdapter(Activity context, String[][] data) {
 
-        this.gridViewClickListener = (OnItemGridViewClick) context;
+//        this.gridViewClickListener = (OnItemGridViewClick) context;
         this.context = context;
         this.data = data;
-        color = new int[data.length][data[0].length];
+//        color = new int[data.length][data[0].length];
         isAnimation = new boolean[data.length][data[0].length];
-        for (int i = 0; i < color.length; i++) {
-            for (int j = 0; j < color[0].length; j++)//the board is rectangular
+        for (int i = 0; i < data.length; i++) {
+            for (int j = 0; j < data[0].length; j++)//the board is rectangular
             {
                 isAnimation[i][j] = false;
             }
         }
-        resetColor();
-        onClickCell(objManager.get(0).startX, objManager.get(0).startY);
-    }
 
-    public void resetColor() {
-        for (int i = 0; i < color.length; i++) {
-            for (int j = 0; j < color[0].length; j++)//the board is rectangular
-            {
-                WordObject obj = objManager.getObjectAt(i, j);
-                if (obj != null)
-                    color[i][j] = NORMAL;
-                else
-                    color[i][j] = TRANSPARENT;
-            }
+        int tempSize = objManager.getObjectArrayList().size();
+        imageLocation = new int[tempSize];
+        for(int i=0;i<tempSize;i++){
+            WordObject wordObject = objManager.get(i);
+            if(wordObject.getOrientation()==WordObject.HORIZONTAL){
+                imageLocation[i]=wordObject.startX+wordObject.startY*10+wordObject.getResult().length();
+            }else
+                imageLocation[i]=wordObject.startX+(wordObject.startY+wordObject.getResult().length())*10;
+            //NOT DISABLE image cell
+            data[imageLocation[i]%GameActivity.NUM_OF_COLLUMN][imageLocation[i]/GameActivity.NUM_OF_ROW] = ENABLE;
         }
-        notifyDataSetChanged();
+//        resetColor();
+//        onClickCell(objManager.get(0).startX, objManager.get(0).startY);
     }
-
 
     @Override
     public int getCount() {
-//        Log.e("GridviewAdapter","data.length = "+data.length+" , data[0].length = "+data[0].length);
         return data.length * data[0].length;//The board must be rectangular
     }
 
@@ -100,20 +96,16 @@ public class GridviewAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-
         // LayoutInflater to call external grid_item.xml file
 
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
         final View gridView;
-
         if (convertView == null) {
             // get layout from grid_item.xml ( Defined Below )
             gridView = inflater.inflate(R.layout.grid_puzzle_item, null);
         } else {
             gridView = convertView;
-
         }
 
         final Button cell = (Button) gridView.findViewById(R.id.button);
@@ -126,51 +118,89 @@ public class GridviewAdapter extends BaseAdapter {
 //        cell.setHeight(MainActivity.getRowHeight());
         cell.setHeight((int) ((metrics.widthPixels / GameActivity.NUM_OF_ROW) * 0.9));
 
-        //set default text
-//        cell.setText(Integer.toString(position));
         cell.setTextColor(Color.BLACK);
         final int positionX = position % GameActivity.NUM_OF_COLLUMN;
-        final int positionY = position / GameActivity.NUM_OF_COLLUMN;
+        final int positionY = position / GameActivity.NUM_OF_ROW;
         if(data[positionX][positionY]==GridviewAdapter.DISABLE){
             cell.setVisibility(View.INVISIBLE);
+            cell.setFocusable(false);
+            cell.setEnabled(false);
+            cell.setClickable(false);
         }
-        for(WordObject wordObject:listWord){
-            int positionImage=0;
-            if(wordObject.getOrientation()==WordObject.HORIZONTAL){
-                positionImage=wordObject.startX+wordObject.startY*10+wordObject.getResult().length();
-            }else
-                positionImage=wordObject.startX+(wordObject.startY+wordObject.getResult().length())*10;
-            if(position==positionImage){
-                cell.setVisibility(View.VISIBLE);
-                cell.setBackgroundResource(R.drawable.ic_action_word);
-            }
-            cell.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Animation animationScale = AnimationUtils.loadAnimation(context, R.anim.scale);
-                    gridView.startAnimation(animationScale);
-                }
-            });
 
+        //Setup Image cells
+        for(int imgLocation:imageLocation)
+        {
+            if(position==imgLocation)//if this is the image cell
+            {
+                cell.setBackgroundResource(R.drawable.ic_action_word);
+                cell.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Animation animationScale = AnimationUtils.loadAnimation(context, R.anim.scale);
+                        gridView.startAnimation(animationScale);
+                    }
+                });
+            }
         }
         return gridView;
     }
 
+    private void settingAnimation() {
+        scaleAnimationX.setStartDelay(0);
+        scaleAnimationX.setRepeatCount(0);
+        scaleAnimationX.setRepeatMode(ValueAnimator.REVERSE);
+        scaleAnimationX.setInterpolator(new LinearInterpolator());
+        scaleAnimationY.setStartDelay(0);
+        scaleAnimationY.setRepeatCount(0);
+        scaleAnimationY.setRepeatMode(ValueAnimator.REVERSE);
+        scaleAnimationY.setInterpolator(new LinearInterpolator());
+    }
+
+    private void startScaleAnimation(View view, int duration) {
+        scaleAnimationX = ObjectAnimator.ofFloat(view, "scaleX", new float[]{0.5f, 1.0f}).setDuration(duration);
+        scaleAnimationY = ObjectAnimator.ofFloat(view, "scaleY", new float[]{0.5f, 1.0f}).setDuration(duration);
+        final AnimatorSet animation = new AnimatorSet();
+        animation.playTogether(scaleAnimationX, scaleAnimationY);
+        animation.start();
+    }
+
     private void onClickCell(int x, int y) {
         //Reset color of the grid
-        resetColor();
+//        resetColor();
 
-        WordObject obj = objManager.getObjectAt(x, y);
+        /*WordObject obj = objManager.getObjectAt(x, y);
         if (obj != null)// If clicked inside a word
         {
             obj.setClickedPosition(x, y);
             clickedOject = obj;
-            colorSurroundCells(x, y);
-
-        }
+//            colorSurroundCells(x, y);
+        }*/
     }
 
-    private void colorSurroundCells(int x, int y)// x,y is the starting point, cell is the work obj to check its length
+    /*public interface OnItemGridViewClick {
+        void onItemGridViewClick(int position);
+    }*/
+
+    /*public void setUpListWord(ArrayList<WordObject> listWord) {
+        this.listWord = listWord;
+    }*/
+
+    /*public void resetColor() {
+        for (int i = 0; i < color.length; i++) {
+            for (int j = 0; j < color[0].length; j++)//the board is rectangular
+            {
+                WordObject obj = objManager.getObjectAt(i, j);
+                if (obj != null)
+                    color[i][j] = ENABLE;
+                else
+                    color[i][j] = DISABLE;
+            }
+        }
+        notifyDataSetChanged();
+    }*/
+
+    /*private void colorSurroundCells(int x, int y)// x,y is the starting point, cell is the work obj to check its length
     {
         color[x][y] = MAIN_CLICKED;
         int tempX = x + 1;// color the subclicked on the right
@@ -195,9 +225,9 @@ public class GridviewAdapter extends BaseAdapter {
             tempY--;
         }
         notifyDataSetChanged();
-    }
+    }*/
 
-    public void nextClickedPosition() {
+    /*public void nextClickedPosition() {
         int lastClickedX = WordObject.getClickedPositionX();
         int lastClickedY = WordObject.getClickedPositionY();
         //Horizontal and stop at last digit
@@ -218,9 +248,9 @@ public class GridviewAdapter extends BaseAdapter {
 //        onClickCell(WordObject.getClickedPositionX(), WordObject.getClickedPositionY());
 
         colorSurroundCells(lastClickedX, lastClickedY);
-    }
+    }*/
 
-    public void backClickedPosition() {
+    /*public void backClickedPosition() {
         int lastClickedX = WordObject.getClickedPositionX();
         int lastClickedY = WordObject.getClickedPositionY();
         //Horizontal and stop at last digit
@@ -241,32 +271,5 @@ public class GridviewAdapter extends BaseAdapter {
 //        onClickCell(WordObject.getClickedPositionX(), WordObject.getClickedPositionY());
 
         colorSurroundCells(lastClickedX, lastClickedY);
-    }
-
-    private void settingAnimation() {
-        scaleAnimationX.setStartDelay(0);
-        scaleAnimationX.setRepeatCount(0);
-        scaleAnimationX.setRepeatMode(ValueAnimator.REVERSE);
-        scaleAnimationX.setInterpolator(new LinearInterpolator());
-        scaleAnimationY.setStartDelay(0);
-        scaleAnimationY.setRepeatCount(0);
-        scaleAnimationY.setRepeatMode(ValueAnimator.REVERSE);
-        scaleAnimationY.setInterpolator(new LinearInterpolator());
-    }
-
-    private void startScaleAnimation(View view, int duration) {
-        scaleAnimationX = ObjectAnimator.ofFloat(view, "scaleX", new float[]{0.5f, 1.0f}).setDuration(duration);
-        scaleAnimationY = ObjectAnimator.ofFloat(view, "scaleY", new float[]{0.5f, 1.0f}).setDuration(duration);
-        final AnimatorSet animation = new AnimatorSet();
-        animation.playTogether(scaleAnimationX, scaleAnimationY);
-        animation.start();
-    }
-
-    public void setUpListWord(ArrayList<WordObject> listWord) {
-        this.listWord = listWord;
-    }
-
-    public interface OnItemGridViewClick {
-        void onItemGridViewClick(int position);
-    }
+    }*/
 }

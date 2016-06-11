@@ -45,32 +45,32 @@ import java.util.ArrayList;
 /**
  * Created by Asus on 6/8/2016.
  */
-public class GameActivity extends Activity implements GridviewAdapter.OnItemGridViewClick {
+public class GameActivity extends Activity{
     public static final int AD_HEIGHT = 50;
     public static final int NUM_OF_COLLUMN = 10;
     public static final int NUM_OF_ROW = NUM_OF_COLLUMN;
-    public static final int MAX_NUM_OF_KEYBOARD_BTN_PER_ROW = 10;
+//    public static final int MAX_NUM_OF_KEYBOARD_BTN_PER_ROW = 10;
     private static GridView gridView;
     //    public int PARENT_VERTICAL_MARGIN;
     private int LINE_HEIGHT;
-    private int BTN_KEYBOARD_MARGIN_LEFT_AND_RIGHT;
-    private int BTN_KEYBOARD_EDGE_SIZE;
+//    private int BTN_KEYBOARD_MARGIN_LEFT_AND_RIGHT;
+//    private int BTN_KEYBOARD_EDGE_SIZE;
     private int screenWidth = 0;
     private int screenHeight = 0;
-    private TextView txtView_question;
-    private ImageView imgView_question;
-    private ImageButton del_btn;
+//    private TextView txtView_question;
+//    private ImageView imgView_question;
+//    private ImageButton del_btn;
     private String[][] gridViewData = new String[NUM_OF_COLLUMN][NUM_OF_ROW];//gridViewData[x][y]
     private WordObjectsManager objManger = WordObjectsManager.getInstance();
     private GridviewAdapter adapter;
-    private ImageButton btCheckAnswer;
+//    private ImageButton btCheckAnswer;
     //    private Button btSolve;
-    private ImageButton btClear;
+//    private ImageButton btClear;
     private DisplayImageOptions opt;
     private ImageLoader imageLoader;
     private AdView mAdView;
     //    private ArrayList<WordObject> listQuestion;
-    private ArrayList<Bitmap> listBitmapImageQuestion;
+//    private ArrayList<Bitmap> listBitmapImageQuestion;
     private StaticVariable staticVariable;
     private String prefName = "data";
     private int doneLevel;
@@ -93,7 +93,7 @@ public class GameActivity extends Activity implements GridviewAdapter.OnItemGrid
         screenWidth = metrics.widthPixels;
         screenHeight = metrics.heightPixels;
         setupGridView();
-        LINE_HEIGHT = (screenHeight - gridView.getMinimumHeight())/5;
+        /*LINE_HEIGHT = (screenHeight - gridView.getMinimumHeight())/5;
         BTN_KEYBOARD_MARGIN_LEFT_AND_RIGHT = LINE_HEIGHT/8; // If need to adjust, change here
         BTN_KEYBOARD_EDGE_SIZE = LINE_HEIGHT-2*BTN_KEYBOARD_MARGIN_LEFT_AND_RIGHT;
         //If the size above is not correct
@@ -103,7 +103,7 @@ public class GameActivity extends Activity implements GridviewAdapter.OnItemGrid
             int temp = screenWidth/((MAX_NUM_OF_KEYBOARD_BTN_PER_ROW));
             BTN_KEYBOARD_MARGIN_LEFT_AND_RIGHT = temp/8; // If need to adjust, change here
             BTN_KEYBOARD_EDGE_SIZE = temp-2*BTN_KEYBOARD_MARGIN_LEFT_AND_RIGHT;
-        }
+        }*/
     }
 
     private void initializeQuestion() {
@@ -129,7 +129,7 @@ public class GameActivity extends Activity implements GridviewAdapter.OnItemGrid
         }
 
         adapter = new GridviewAdapter(this, gridViewData);
-        adapter.setUpListWord(objManger.getObjectArrayList());
+//        adapter.setUpListWord(objManger.getObjectArrayList());
         gridView = (GridView) findViewById(R.id.gridview_puzzle);
         gridView.setMinimumHeight(screenWidth);
         gridView.setAdapter(adapter);
@@ -160,10 +160,10 @@ public class GameActivity extends Activity implements GridviewAdapter.OnItemGrid
         return super.onOptionsItemSelected(item);
     }
 
-    //    @Override
+    /*//    @Override
     public void onItemGridViewClick(int position) {
         int positionX = position % NUM_OF_COLLUMN;
-        int positionY = position / NUM_OF_COLLUMN;}
+        int positionY = position / NUM_OF_COLLUMN;}*/
 
     private boolean checkAnswer() {
         boolean checkAnswer = true;
