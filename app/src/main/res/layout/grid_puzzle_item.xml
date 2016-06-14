@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/BGLinear"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/BGLinear2"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:layout_gravity="center"
+    android:padding="0dp"
+    >
 
     <Button
         android:id="@+id/button"
@@ -11,7 +14,8 @@
         android:layout_width="@dimen/button_grid_puzzle_size"
         android:layout_height="@dimen/button_grid_puzzle_size"
         android:textSize="15dp"
-        android:layout_margin="0dp" />
+        style="@style/BlueButton"
+        android:layout_margin="1dp"/>
     <TextView
         android:id="@+id/tvItemSTT"
         android:layout_width="wrap_content"
@@ -23,4 +27,4 @@
         android:layout_marginLeft="4dp"
         />
 
-</FrameLayout>
+</RelativeLayout>

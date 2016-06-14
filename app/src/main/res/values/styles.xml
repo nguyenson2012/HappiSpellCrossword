@@ -11,4 +11,20 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="FlashCardButton" parent="@android:style/Widget.Button">
+        <item name="android:gravity">center_vertical|center_horizontal</item>
+        <item name="android:textColor">#FFFFFFFF</item>
+        <item name="android:shadowColor">#FF000000</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">-1</item>
+        <item name="android:shadowRadius">0.2</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:clickable">true</item>
+    </style>
+
+    <style name="BlueButton" parent="FlashCardButton">
+        <item name="android:background">@drawable/btn_blue</item>
+    </style>
 </resources>

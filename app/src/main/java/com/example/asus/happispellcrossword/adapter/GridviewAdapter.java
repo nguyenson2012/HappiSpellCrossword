@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -112,20 +113,45 @@ public class GridviewAdapter extends BaseAdapter {
         final TextView textViewNumberQuestion = (TextView) gridView.findViewById(R.id.tvItemSTT);
 
         //set Row Height
-        DisplayMetrics metrics = new DisplayMetrics();
-        metrics = context.getResources().getDisplayMetrics();
-        cell.setMinimumHeight(0);
-//        cell.setHeight(MainActivity.getRowHeight());
-        cell.setHeight((int) ((metrics.widthPixels / GameActivity.NUM_OF_ROW) * 0.9));
+        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        ViewGroup.LayoutParams layoutParams = cell.getLayoutParams();
+        layoutParams.height = (int) ((metrics.heightPixels / GameActivity.NUM_OF_ROW)* 0.95);
+        cell.setLayoutParams(layoutParams);
+//        cell.setMinimumHeight(2);
+//        cell.setHeight(2);
+//        cell.setHeight((int) ((metrics.widthPixels / GameActivity.NUM_OF_ROW) * 0.9));
 
         cell.setTextColor(Color.BLACK);
         final int positionX = position % GameActivity.NUM_OF_COLLUMN;
         final int positionY = position / GameActivity.NUM_OF_ROW;
         if(data[positionX][positionY]==GridviewAdapter.DISABLE){
-            cell.setVisibility(View.INVISIBLE);
-            cell.setFocusable(false);
-            cell.setEnabled(false);
-            cell.setClickable(false);
+//            cell.setVisibility(View.INVISIBLE);
+//            cell.setFocusable(false);
+//            cell.setEnabled(false);
+//            cell.setClickable(false);
+
+            gridView.setVisibility(View.INVISIBLE);
+            gridView.setFocusable(false);
+            gridView.setEnabled(false);
+            gridView.setClickable(false);
+        }
+        else {
+//            cell.setVisibility(View.VISIBLE);
+            cell.setText(data[positionX][positionY]);
+//            if (listWord.size() > 0) {
+                for (WordObject wordObject : objManager.getObjectArrayList())
+                    if (positionX == wordObject.startX && positionY == wordObject.startY)
+                        textViewNumberQuestion.setText(wordObject.getPosition()+"");
+//            }
+
+
+            if (!isAnimation[positionX][positionY]) {
+                //backGround.startAnimation(animation);
+                startScaleAnimation(gridView, 1000 + positionX * 250 + positionY * 50);
+                isAnimation[positionX][positionY] = true;
+            }
+//            cell.setTextSize(15);
+//            Log.e("ADAPTER","x= "+positionX+" , y= "+positionY+" , setText = "+data[positionX][positionY]);
         }
 
         //Setup Image cells
