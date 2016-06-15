@@ -99,8 +99,8 @@
         android:layout_width="0dp"
         android:layout_weight="2"
         android:layout_height="match_parent"
-        android:horizontalSpacing="2dp"
-        android:verticalSpacing="2dp"></GridView>
+        android:horizontalSpacing="1dp"
+        android:verticalSpacing="1dp"></GridView>
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
@@ -203,6 +203,11 @@
                 android:layout_height="@dimen/button_answer_size"
                 android:text="Z"/>
         </LinearLayout>
+        <Button
+            android:id="@+id/btCheckAnswer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Check Answer"/>
 
     </LinearLayout>
 

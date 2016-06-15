@@ -9,6 +9,9 @@ import java.util.HashMap;
  * Created by Asus on 5/30/2016.
  */
 public class StaticVariable {
+    public static final String PREF_NAME="data";
+    public static final String DONE_LEVEL="done_level";
+    public static final String CURRENT_LEVEL="current_level";
     private static StaticVariable instance;
     private static ArrayList<Stage> allStage;
     private static HashMap<Integer, ArrayList<Bitmap>> bitMapImageStageMap;

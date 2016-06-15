@@ -44,6 +44,7 @@ public class GridviewAdapter extends BaseAdapter {
     ObjectAnimator scaleAnimationY = new ObjectAnimator();
     WordObjectsManager objManager = WordObjectsManager.getInstance();
     private Context context;
+    private ChangeLevelInterface changeLevelListener;
     private String data[][];//The board must be rectangular + data[x][y]
     private String answer[][];
     private int imageLocation[];
@@ -53,12 +54,14 @@ public class GridviewAdapter extends BaseAdapter {
     private DisplayImageOptions opt;
     private ArrayList<WordObject> listQuestion=new ArrayList<WordObject>();
     private static boolean isQuestionAnimation[];
+    boolean isNotifyDoneLevel=false;
 
     public GridviewAdapter(Activity context, String[][] data) {
-
 //        this.gridViewClickListener = (OnItemGridViewClick) context;
+        isNotifyDoneLevel=false;
         this.context = context;
         this.data = data;
+        this.changeLevelListener=(ChangeLevelInterface)context;
         setupAnswer();
         isQuestionAnimation=new boolean[listQuestion.size()];
         for(int i=0;i<listQuestion.size();i++)
@@ -81,7 +84,7 @@ public class GridviewAdapter extends BaseAdapter {
             }else
                 imageLocation[i]=wordObject.startX+(wordObject.startY+wordObject.getResult().length())*10;
             //NOT DISABLE image cell
-            data[imageLocation[i]%GameActivity.NUM_OF_COLLUMN][imageLocation[i]/GameActivity.NUM_OF_ROW] = ENABLE;
+            this.data[imageLocation[i]%GameActivity.NUM_OF_COLLUMN][imageLocation[i]/GameActivity.NUM_OF_ROW] = ENABLE;
         }
 //        resetColor();
 //        onClickCell(objManager.get(0).startX, objManager.get(0).startY);
@@ -136,12 +139,12 @@ public class GridviewAdapter extends BaseAdapter {
         final Button cell = (Button) gridView.findViewById(R.id.button);
         final TextView textViewNumberQuestion = (TextView) gridView.findViewById(R.id.tvItemSTT);
 
-        //set Row Height
-        DisplayMetrics metrics = new DisplayMetrics();
-        metrics = context.getResources().getDisplayMetrics();
-        cell.setMinimumHeight(0);
-//        cell.setHeight(MainActivity.getRowHeight());
-        cell.setHeight((int) ((metrics.widthPixels / GameActivity.NUM_OF_ROW) * 0.9));
+//        //set Row Height
+//        DisplayMetrics metrics = new DisplayMetrics();
+//        metrics = context.getResources().getDisplayMetrics();
+//        cell.setMinimumHeight(0);
+////        cell.setHeight(MainActivity.getRowHeight());
+//        cell.setHeight((int) ((metrics.widthPixels / GameActivity.NUM_OF_ROW) * 0.9));
 
         cell.setTextColor(Color.BLACK);
         final int positionX = position % GameActivity.NUM_OF_COLLUMN;
@@ -171,6 +174,11 @@ public class GridviewAdapter extends BaseAdapter {
                             gridView.startAnimation(animationScale);
                             if(positionX==startX+answerQuestion.length()-1)
                                 isQuestionAnimation[j]=false;
+                            if(checkResult()&&!isNotifyDoneLevel){
+                                //changeLevelListener.increaseLevel();
+                                changeLevelListener.notifyDoneQuestion();
+                                isNotifyDoneLevel=true;
+                            }
                         }
                     }
                     checkAnswer=true;
@@ -185,6 +193,11 @@ public class GridviewAdapter extends BaseAdapter {
                             gridView.startAnimation(animationScale);
                             if(positionY==startY+answerQuestion.length()-1)
                                 isQuestionAnimation[j]=false;
+                            if(checkResult()&&!isNotifyDoneLevel){
+                                //changeLevelListener.increaseLevel();
+                                changeLevelListener.notifyDoneQuestion();
+                                isNotifyDoneLevel=true;
+                            }
                         }
                     }
                     checkAnswer=true;
@@ -227,6 +240,35 @@ public class GridviewAdapter extends BaseAdapter {
         final AnimatorSet animation = new AnimatorSet();
         animation.playTogether(scaleAnimationX, scaleAnimationY);
         animation.start();
+    }
+
+    private boolean checkResult() {
+        boolean checkAnswer = true;
+        for (WordObject question : listQuestion) {
+            String answer = "";
+            int firstX = question.startX;
+            int firstY = question.startY;
+            if (question.getOrientation() == WordObject.HORIZONTAL) {
+                for (int i = 0; i < question.getResult().length(); i++) {
+                    answer = answer.concat(data[firstX + i][firstY]);
+                }
+                if (!answer.equals(question.getResult()))
+                    checkAnswer = false;
+            } else {
+                for (int i = 0; i < question.getResult().length(); i++) {
+                    answer = answer.concat(data[firstX][firstY + i]);
+                }
+                if (!answer.equals(question.getResult()))
+                    checkAnswer = false;
+            }
+
+        }
+        return checkAnswer;
+    }
+
+    public interface ChangeLevelInterface{
+        public void increaseLevel();
+        public void notifyDoneQuestion();
     }
 
     private void onClickCell(int x, int y) {

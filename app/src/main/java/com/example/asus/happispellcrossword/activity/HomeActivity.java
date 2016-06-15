@@ -35,7 +35,7 @@ public class HomeActivity extends AppCompatActivity {
     private int screenWidth;
     private int screenHeight;
     private int doneLevel = 0;
-    private String prefName = "data";
+    private StaticVariable staticVariable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +43,7 @@ public class HomeActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_activity_layout);
+        staticVariable=StaticVariable.getInstance();
         getTimeCompleteStage();
         getdoneLevel();
         setDefaultDataLevel();
@@ -62,16 +63,16 @@ public class HomeActivity extends AppCompatActivity {
 
     private void getdoneLevel() {
         SharedPreferences pre = getSharedPreferences
-                (prefName, MODE_PRIVATE);
+                (StaticVariable.PREF_NAME, MODE_PRIVATE);
         SharedPreferences.Editor editor = pre.edit();
         //editor.clear();
         editor.commit();
-        doneLevel = pre.getInt("doneLevel", 0);
+        doneLevel = pre.getInt(StaticVariable.DONE_LEVEL, 0);
     }
 
     private void getTimeCompleteStage() {
         SharedPreferences pre = getSharedPreferences
-                (prefName, MODE_PRIVATE);
+                (StaticVariable.PREF_NAME, MODE_PRIVATE);
         for (Stage stage : StaticVariable.getInstance().getAllStage()) {
             int timeComplete = pre.getInt(stage.getDescriptionStage() + "", 0);
             stage.setSecondComplete(timeComplete);

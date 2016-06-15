@@ -2,8 +2,10 @@ package com.example.asus.happispellcrossword.activity;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -48,7 +50,7 @@ import java.util.ArrayList;
 /**
  * Created by Asus on 6/8/2016.
  */
-public class GameActivity extends Activity{
+public class GameActivity extends Activity implements GridviewAdapter.ChangeLevelInterface{
     public static final int AD_HEIGHT = 50;
     public static final int NUM_OF_COLLUMN = 10;
     public static final int NUM_OF_ROW = NUM_OF_COLLUMN;
@@ -75,12 +77,12 @@ public class GameActivity extends Activity{
     private ArrayList<WordObject> listQuestion;
 //    private ArrayList<Bitmap> listBitmapImageQuestion;
     private StaticVariable staticVariable;
-    private String prefName = "data";
     private int doneLevel;
     private int currentLevel=1;
     private int timeStartLevel = 0;
     private int timeCompleteLevel = 0;
     private boolean allLevelDone = false;
+    private Button btCheckAnswer;
     private ArrayList<Button> listKeyboard=new ArrayList<Button>();
     private int[] arrayButtonKeyboard={R.id.bt_answer_A,R.id.bt_answer_B,R.id.bt_answer_C,R.id.bt_answer_D,
             R.id.bt_answer_D,R.id.bt_answer_E,R.id.bt_answer_F,R.id.bt_answer_G,R.id.bt_answer_H,R.id.bt_answer_I,
@@ -95,6 +97,8 @@ public class GameActivity extends Activity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         staticVariable = StaticVariable.getInstance();
+        getLevelPosition();
+        getdoneLevel();
         timeStartLevel = (int) (System.currentTimeMillis() / 1000);
 //        context = this;
         DisplayMetrics metrics = new DisplayMetrics();
@@ -117,6 +121,19 @@ public class GameActivity extends Activity{
         }*/
     }
 
+    private void getdoneLevel() {
+        SharedPreferences pre = getSharedPreferences
+                (StaticVariable.PREF_NAME, MODE_PRIVATE);
+        SharedPreferences.Editor editor = pre.edit();
+        //editor.clear();
+        editor.commit();
+        doneLevel = pre.getInt(StaticVariable.DONE_LEVEL, 0);
+    }
+    private void getLevelPosition() {
+        Intent intent = getIntent();
+        currentLevel = intent.getIntExtra("levelposition", 1);
+    }
+
     private void registerEvent() {
         for(final Button button:listKeyboard){
             button.setOnTouchListener(new ChoiceTouchListener());
@@ -129,6 +146,14 @@ public class GameActivity extends Activity{
             Button button=(Button)findViewById(arrayButtonKeyboard[i]);
             listKeyboard.add(button);
         }
+        btCheckAnswer=(Button)findViewById(R.id.btCheckAnswer);
+        btCheckAnswer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(checkAnswer())
+                    increaseLevel();
+            }
+        });
     }
 
     private void initializeQuestion() {
@@ -139,7 +164,8 @@ public class GameActivity extends Activity{
     private void setupGridView() {
         initializeQuestion();
         //Reset gridview
-        for (int i = 0; i < gridViewData.length; i++) {
+        gridViewData = new String[NUM_OF_COLLUMN][NUM_OF_ROW];
+        for (int i = 0; i < gridViewData[0].length; i++) {
             for (int j = 0; j < gridViewData[0].length; j++)//the board is rectangular
             {
                 WordObject temp = objManger.getObjectAt(i, j);
@@ -228,6 +254,57 @@ public class GameActivity extends Activity{
                 }
             }
             adapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void increaseLevel() {
+        increaseCurrentLevel();
+        //initializeQuestion();
+        if (!allLevelDone)
+            setupGridView();
+    }
+
+    @Override
+    public void notifyDoneQuestion() {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            alertDialogBuilder.setMessage("GO TO NEXT LEVEL");
+
+            alertDialogBuilder.setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface arg0, int arg1) {
+                    increaseLevel();
+                }
+            });
+
+            alertDialogBuilder.setNegativeButton("No",new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+            });
+
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+    }
+
+    private void increaseCurrentLevel() {
+        SharedPreferences pre = getSharedPreferences
+                (StaticVariable.PREF_NAME, MODE_PRIVATE);
+        SharedPreferences.Editor editor = pre.edit();
+        if(doneLevel==staticVariable.getAllStage().size()){
+            allLevelDone = true;
+        }
+        if (doneLevel < staticVariable.getAllStage().size()&&currentLevel==doneLevel+1) {
+            doneLevel++;
+        }
+        if(currentLevel<staticVariable.getAllStage().size())
+            currentLevel++;
+
+        if(doneLevel>pre.getInt(StaticVariable.DONE_LEVEL, 0)) {
+            editor.putInt(StaticVariable.DONE_LEVEL, doneLevel);
+            editor.putInt(StaticVariable.CURRENT_LEVEL,currentLevel);
+            editor.commit();
         }
     }
 
