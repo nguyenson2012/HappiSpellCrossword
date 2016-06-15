@@ -3,6 +3,7 @@ package com.example.asus.happispellcrossword.activity;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -267,25 +268,45 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
 
     @Override
     public void notifyDoneQuestion() {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-            alertDialogBuilder.setMessage("GO TO NEXT LEVEL");
-
-            alertDialogBuilder.setPositiveButton("yes", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface arg0, int arg1) {
-                    increaseLevel();
-                }
-            });
-
-            alertDialogBuilder.setNegativeButton("No",new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    finish();
-                }
-            });
-
-            AlertDialog alertDialog = alertDialogBuilder.create();
-            alertDialog.show();
+//            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+//            alertDialogBuilder.setMessage("GO TO NEXT LEVEL");
+//
+//            alertDialogBuilder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface arg0, int arg1) {
+//                    increaseLevel();
+//                }
+//            });
+//
+//            alertDialogBuilder.setNegativeButton("No",new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface dialog, int which) {
+//                    finish();
+//                }
+//            });
+//
+//            AlertDialog alertDialog = alertDialogBuilder.create();
+//            alertDialog.show();
+        final Dialog dialog=new Dialog(GameActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_next_level);
+        Button btLevel=(Button)dialog.findViewById(R.id.buttonLevel);
+        Button btNextlevel=(Button)dialog.findViewById(R.id.buttonNextLevel);
+        btLevel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                finish();
+            }
+        });
+        btNextlevel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                increaseLevel();
+            }
+        });
+        dialog.show();
     }
 
     private void increaseCurrentLevel() {

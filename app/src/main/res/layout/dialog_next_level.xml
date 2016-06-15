@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="320dp"
+    android:layout_height="200dp"
+    android:background="@drawable/greatjob">
+    <Button
+        android:id="@+id/buttonLevel"
+        android:layout_width="@dimen/button_level_size"
+        android:layout_height="@dimen/button_level_size"
+        android:text="Level"
+        android:textSize="@dimen/text_size"
+        android:layout_alignParentBottom="true" />
+    <Button
+        android:id="@+id/buttonNextLevel"
+        android:layout_width="@dimen/button_level_size"
+        android:layout_height="@dimen/button_level_size"
+        android:text="Next"
+        android:textSize="@dimen/text_size"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"/>
+</RelativeLayout>
