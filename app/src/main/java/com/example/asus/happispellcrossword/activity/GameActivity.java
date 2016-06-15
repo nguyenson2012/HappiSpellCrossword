@@ -2,6 +2,7 @@ package com.example.asus.happispellcrossword.activity;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,13 +14,13 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageButton;
@@ -29,7 +30,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.asus.happispellcrossword.R;
-import com.example.asus.happispellcrossword.adapter.Gridview2Adapter;
 import com.example.asus.happispellcrossword.adapter.GridviewAdapter;
 import com.example.asus.happispellcrossword.model.StaticVariable;
 import com.example.asus.happispellcrossword.model.WordObject;
@@ -52,12 +52,10 @@ public class GameActivity extends Activity{
     public static final int AD_HEIGHT = 50;
     public static final int NUM_OF_COLLUMN = 10;
     public static final int NUM_OF_ROW = NUM_OF_COLLUMN;
-    public static final double WEIGHT_COEFF = 2.5;
 //    public static final int MAX_NUM_OF_KEYBOARD_BTN_PER_ROW = 10;
     private static GridView gridView;
-    private static GridView gridView2;
     //    public int PARENT_VERTICAL_MARGIN;
-//    private int LINE_HEIGHT;
+    private int LINE_HEIGHT;
 //    private int BTN_KEYBOARD_MARGIN_LEFT_AND_RIGHT;
 //    private int BTN_KEYBOARD_EDGE_SIZE;
     private int screenWidth = 0;
@@ -68,14 +66,13 @@ public class GameActivity extends Activity{
     private String[][] gridViewData = new String[NUM_OF_COLLUMN][NUM_OF_ROW];//gridViewData[x][y]
     private WordObjectsManager objManger = WordObjectsManager.getInstance();
     private GridviewAdapter adapter;
-    private Gridview2Adapter adapter2;
 //    private ImageButton btCheckAnswer;
     //    private Button btSolve;
 //    private ImageButton btClear;
     private DisplayImageOptions opt;
     private ImageLoader imageLoader;
     private AdView mAdView;
-    //    private ArrayList<WordObject> listQuestion;
+    private ArrayList<WordObject> listQuestion;
 //    private ArrayList<Bitmap> listBitmapImageQuestion;
     private StaticVariable staticVariable;
     private String prefName = "data";
@@ -84,6 +81,12 @@ public class GameActivity extends Activity{
     private int timeStartLevel = 0;
     private int timeCompleteLevel = 0;
     private boolean allLevelDone = false;
+    private ArrayList<Button> listKeyboard=new ArrayList<Button>();
+    private int[] arrayButtonKeyboard={R.id.bt_answer_A,R.id.bt_answer_B,R.id.bt_answer_C,R.id.bt_answer_D,
+            R.id.bt_answer_D,R.id.bt_answer_E,R.id.bt_answer_F,R.id.bt_answer_G,R.id.bt_answer_H,R.id.bt_answer_I,
+            R.id.bt_answer_J,R.id.bt_answer_K,R.id.bt_answer_L,R.id.bt_answer_M,R.id.bt_answer_N,R.id.bt_answer_O,
+            R.id.bt_answer_P,R.id.bt_answer_Q,R.id.bt_answer_R,R.id.bt_answer_S,R.id.bt_answer_T,R.id.bt_answer_U,
+            R.id.bt_answer_V,R.id.bt_answer_W,R.id.bt_answer_X,R.id.bt_answer_Y,R.id.bt_answer_Z};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,8 +101,9 @@ public class GameActivity extends Activity{
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         screenWidth = metrics.widthPixels;
         screenHeight = metrics.heightPixels;
+        setupKeyboard();
         setupGridView();
-        setupGridView2();
+        registerEvent();
         /*LINE_HEIGHT = (screenHeight - gridView.getMinimumHeight())/5;
         BTN_KEYBOARD_MARGIN_LEFT_AND_RIGHT = LINE_HEIGHT/8; // If need to adjust, change here
         BTN_KEYBOARD_EDGE_SIZE = LINE_HEIGHT-2*BTN_KEYBOARD_MARGIN_LEFT_AND_RIGHT;
@@ -111,6 +115,20 @@ public class GameActivity extends Activity{
             BTN_KEYBOARD_MARGIN_LEFT_AND_RIGHT = temp/8; // If need to adjust, change here
             BTN_KEYBOARD_EDGE_SIZE = temp-2*BTN_KEYBOARD_MARGIN_LEFT_AND_RIGHT;
         }*/
+    }
+
+    private void registerEvent() {
+        for(final Button button:listKeyboard){
+            button.setOnTouchListener(new ChoiceTouchListener());
+        }
+        gridView.setOnDragListener(new ChoiceDragListener());
+    }
+
+    private void setupKeyboard() {
+        for(int i=0;i<arrayButtonKeyboard.length;i++){
+            Button button=(Button)findViewById(arrayButtonKeyboard[i]);
+            listKeyboard.add(button);
+        }
     }
 
     private void initializeQuestion() {
@@ -138,28 +156,11 @@ public class GameActivity extends Activity{
         adapter = new GridviewAdapter(this, gridViewData);
 //        adapter.setUpListWord(objManger.getObjectArrayList());
         gridView = (GridView) findViewById(R.id.gridview_puzzle);
-//        gridView.setMinimumHeight(5);
-//        ViewGroup.LayoutParams layoutParams = gridView.getLayoutParams();
-//        layoutParams.height = screenWidth;
-//        gridView.setLayoutParams(layoutParams);
+        gridView.setMinimumHeight(screenWidth);
         gridView.setAdapter(adapter);
         gridView.setNumColumns(NUM_OF_COLLUMN);
 //        gridView.setColumnWidth((int) ((gridView.getWidth() / NUM_OF_COLLUMN) * 0.9));
-//        gridView.setMinimumWidth(screenWidth);
-    }
-
-    private void setupGridView2() {
-
-        adapter2 = new Gridview2Adapter(this);
-        gridView2 = (GridView) findViewById(R.id.gridview2_puzzle);
-//        gridView2.setMinimumHeight(screenWidth);
-        gridView2.setAdapter(adapter2);
-//        gridView2.setNumColumns(3);
-//        gridView2.setColumnWidth((int) ((gridView.getWidth() / NUM_OF_COLLUMN) * 0.9));
-//        gridView2.setMinimumWidth(screenWidth);
-        //TODO change here
-        gridView2.setNumColumns((int)(NUM_OF_COLLUMN/WEIGHT_COEFF));
-
+        gridView.setMinimumWidth(screenWidth);
     }
 
     @Override
@@ -229,6 +230,64 @@ public class GameActivity extends Activity{
             adapter.notifyDataSetChanged();
         }
     }
+
+    private final class ChoiceTouchListener implements View.OnTouchListener {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                //setup drag
+                ClipData data = ClipData.newPlainText("", "");
+                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
+
+                //start dragging the item touched
+                view.startDrag(data, shadowBuilder, view, 0);
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    }
+
+    private class ChoiceDragListener implements View.OnDragListener {
+        @Override
+        public boolean onDrag(View v, DragEvent dragEvent) {
+            switch (dragEvent.getAction()) {
+                case DragEvent.ACTION_DRAG_STARTED:
+                    //no action necessary
+                    break;
+                case DragEvent.ACTION_DRAG_ENTERED:
+                    //no action necessary
+                    break;
+                case DragEvent.ACTION_DRAG_EXITED:
+                    //no action necessary
+                    break;
+                case DragEvent.ACTION_DROP:
+                    int newPosition = gridView.pointToPosition(
+                            (int) (dragEvent.getX()), (int) dragEvent.getY());
+                    View view = (View) dragEvent.getLocalState();
+                    //stop displaying the view where it was before it was dragged
+                    //view.setVisibility(View.INVISIBLE);
+                    //view being dragged and dropped
+                    Button droppedButton = (Button) view;
+                    if(newPosition!=GridView.INVALID_POSITION) {
+                        int positionX=newPosition%GameActivity.NUM_OF_COLLUMN;
+                        int positionY=newPosition/GameActivity.NUM_OF_COLLUMN;
+                        gridViewData[positionX][positionY]=droppedButton.getText()+"";
+                        adapter.notifyDataSetChanged();
+                        gridView.invalidateViews();
+                    }
+                    break;
+                case DragEvent.ACTION_DRAG_ENDED:
+                    //no action necessary
+                    break;
+                default:
+                    break;
+            }
+            return true;
+        }
+    }
+
 
 
 }

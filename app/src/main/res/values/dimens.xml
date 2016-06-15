@@ -11,4 +11,5 @@
     <dimen name="recycleview_stage_margin_top">100dp</dimen>
     <dimen name="recycleview_stage_margin_bottom">80dp</dimen>
     <dimen name="button_grid_puzzle_size">50dp</dimen>
+    <dimen name="button_answer_size">40dp</dimen>
 </resources>
