@@ -18,6 +18,7 @@ import com.example.asus.happispellcrossword.adapter.GridViewLevelAdapter;
 import com.example.asus.happispellcrossword.adapter.RecyclerItemClickListener;
 import com.example.asus.happispellcrossword.model.Stage;
 import com.example.asus.happispellcrossword.model.StaticVariable;
+import com.example.asus.happispellcrossword.utils.DBHelper;
 
 import java.util.ArrayList;
 
@@ -36,6 +37,7 @@ public class HomeActivity extends AppCompatActivity {
     private int screenHeight;
     private int doneLevel = 0;
     private StaticVariable staticVariable;
+    private DBHelper databse;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +52,28 @@ public class HomeActivity extends AppCompatActivity {
         setUpView();
         setAdapterForRecyclerView();
         registerEvent();
+        if(!checkAlreadyDatabase())
+            setupDatabse();
+    }
+
+    private void setupDatabse() {
+        databse=new DBHelper(this);
+        for(Stage stage:stageItems){
+            databse.insertStage(stage);
+            databse.insertQuestion(stage);
+        }
+        SharedPreferences pre = getSharedPreferences
+                (StaticVariable.PREF_NAME, MODE_PRIVATE);
+        SharedPreferences.Editor editor=pre.edit();
+        editor.putBoolean(StaticVariable.DATABASE,true);
+        editor.commit();
+    }
+
+    private boolean checkAlreadyDatabase(){
+        SharedPreferences pre = getSharedPreferences
+                (StaticVariable.PREF_NAME, MODE_PRIVATE);
+        boolean alreadyDatabase=pre.getBoolean(StaticVariable.DATABASE,false);
+        return alreadyDatabase;
     }
 
     @Override

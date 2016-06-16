@@ -5,7 +5,9 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,7 +25,12 @@ import com.example.asus.happispellcrossword.R;
 import com.example.asus.happispellcrossword.activity.GameActivity;
 import com.example.asus.happispellcrossword.model.WordObject;
 import com.example.asus.happispellcrossword.model.WordObjectsManager;
+import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 import java.util.ArrayList;
 
@@ -52,6 +59,7 @@ public class GridviewAdapter extends BaseAdapter {
 //    private OnItemGridViewClick gridViewClickListener;
     private Animation animation;
     private DisplayImageOptions opt;
+    private ImageLoader imageLoader;
     private ArrayList<WordObject> listQuestion=new ArrayList<WordObject>();
     private static boolean isQuestionAnimation[];
     boolean isNotifyDoneLevel=false;
@@ -86,9 +94,35 @@ public class GridviewAdapter extends BaseAdapter {
             //NOT DISABLE image cell
             this.data[imageLocation[i]%GameActivity.NUM_OF_COLLUMN][imageLocation[i]/GameActivity.NUM_OF_ROW] = ENABLE;
         }
+        initImageLoader(context);
+        setupImageDisplayOptions();
 //        resetColor();
 //        onClickCell(objManager.get(0).startX, objManager.get(0).startY);
     }
+
+    private void initImageLoader(Context context) {
+        ImageLoaderConfiguration.Builder config = new ImageLoaderConfiguration.Builder(context);
+        config.threadPriority(Thread.NORM_PRIORITY - 2);
+        config.denyCacheImageMultipleSizesInMemory();
+        config.diskCacheFileNameGenerator(new Md5FileNameGenerator());
+        config.diskCacheSize(6 * 1024 * 1024); // 6 MiB
+        config.tasksProcessingOrder(QueueProcessingType.LIFO);
+
+        // Initialize ImageLoader with configuration.
+        imageLoader = ImageLoader.getInstance();
+        imageLoader.init(config.build());
+    }
+
+    private void setupImageDisplayOptions() {
+        opt = new DisplayImageOptions.Builder()
+                .showImageForEmptyUri(R.drawable.ic_error_48pt)
+                .showImageOnFail(R.drawable.ic_error_48pt)
+                .cacheInMemory(false)
+                .cacheOnDisk(true)
+                .resetViewBeforeLoading(false)
+                .bitmapConfig(Bitmap.Config.RGB_565).build();
+    }
+
 
     private void setupAnswer() {
         answer=new String[GameActivity.NUM_OF_COLLUMN][GameActivity.NUM_OF_COLLUMN];
@@ -206,11 +240,19 @@ public class GridviewAdapter extends BaseAdapter {
         }
 
         //Setup Image cells
-        for(int imgLocation:imageLocation)
+        for(int i=0;i<imageLocation.length;i++)
         {
+            int imgLocation=imageLocation[i];
             if(position==imgLocation)//if this is the image cell
             {
-                cell.setBackgroundResource(R.drawable.ic_action_word);
+                //cell.setBackgroundResource(R.drawable.ic_action_word);
+                imageLoader.loadImage(listQuestion.get(i).getImageLink(), new SimpleImageLoadingListener() {
+                    @Override
+                    public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                        super.onLoadingComplete(imageUri, view, loadedImage);
+                        cell.setBackground(new BitmapDrawable(loadedImage));
+                    }
+                });
                 cell.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

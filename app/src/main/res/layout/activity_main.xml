@@ -207,6 +207,7 @@
             android:id="@+id/btCheckAnswer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:text="Check Answer"/>
 
     </LinearLayout>

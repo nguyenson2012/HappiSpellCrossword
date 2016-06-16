@@ -37,6 +37,7 @@ import com.example.asus.happispellcrossword.adapter.GridviewAdapter;
 import com.example.asus.happispellcrossword.model.StaticVariable;
 import com.example.asus.happispellcrossword.model.WordObject;
 import com.example.asus.happispellcrossword.model.WordObjectsManager;
+import com.example.asus.happispellcrossword.utils.DBHelper;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
@@ -90,6 +91,7 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
             R.id.bt_answer_J,R.id.bt_answer_K,R.id.bt_answer_L,R.id.bt_answer_M,R.id.bt_answer_N,R.id.bt_answer_O,
             R.id.bt_answer_P,R.id.bt_answer_Q,R.id.bt_answer_R,R.id.bt_answer_S,R.id.bt_answer_T,R.id.bt_answer_U,
             R.id.bt_answer_V,R.id.bt_answer_W,R.id.bt_answer_X,R.id.bt_answer_Y,R.id.bt_answer_Z};
+    private DBHelper database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +99,7 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        database=new DBHelper(this);
         staticVariable = StaticVariable.getInstance();
         getLevelPosition();
         getdoneLevel();
@@ -159,7 +162,9 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
 
     private void initializeQuestion() {
         objManger.setObjectArrayList(new ArrayList<WordObject>());
-        objManger.setObjectArrayList(staticVariable.getAllStage().get(currentLevel - 1).getListQuestion());
+        //objManger.setObjectArrayList(staticVariable.getAllStage().get(currentLevel - 1).getListQuestion());
+        ArrayList<WordObject> listQuestion=database.getListQuestion(currentLevel);
+        objManger.setObjectArrayList(listQuestion);
     }
 
     private void setupGridView() {

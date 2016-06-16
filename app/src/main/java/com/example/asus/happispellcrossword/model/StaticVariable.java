@@ -12,6 +12,7 @@ public class StaticVariable {
     public static final String PREF_NAME="data";
     public static final String DONE_LEVEL="done_level";
     public static final String CURRENT_LEVEL="current_level";
+    public static final String DATABASE="database";
     private static StaticVariable instance;
     private static ArrayList<Stage> allStage;
     private static HashMap<Integer, ArrayList<Bitmap>> bitMapImageStageMap;
