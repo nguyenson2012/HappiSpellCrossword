@@ -85,6 +85,21 @@ public class DBHelper extends SQLiteOpenHelper {
         }
         return true;
     }
+    public boolean insertQuestion(WordObject wordObject){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(QUESTION_STAGE_POSITION,wordObject.getStagePosition());
+        contentValues.put(QUESTION_QUIZ,wordObject.getQuestion());
+        contentValues.put(QUESTION_RESULT,wordObject.getResult());
+        contentValues.put(QUESTION_IMG_LINK,wordObject.getImageLink());
+        contentValues.put(QUESTION_ORIENTATION,wordObject.getOrientation());
+        contentValues.put(QUESTION_STARTX,wordObject.startX);
+        contentValues.put(QUESTION_STARTY,wordObject.startY);
+        contentValues.put(QUESTION_POSITION,wordObject.getPosition());
+        db.insert(QUESTION_TABLE_NAME,null,contentValues);
+
+        return true;
+    }
 
 
     public ArrayList<Stage> getAllStage(){
