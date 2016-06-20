@@ -189,7 +189,14 @@ public class GridviewAdapter extends BaseAdapter {
             cell.setEnabled(false);
             cell.setClickable(false);
         }else {
-            if(data[positionX][positionY].equals(answer[positionX][positionY])) {
+                //show number of question on cell
+                if (listQuestion.size() > 0) {
+                    for (WordObject wordObject : listQuestion)
+                        if (positionX == wordObject.startX && positionY == wordObject.startY)
+                            textViewNumberQuestion.setText(wordObject.getPosition()+"");
+                }
+
+                if(data[positionX][positionY].equals(answer[positionX][positionY])) {
                 boolean checkAnswer=true;
                 cell.setText(data[positionX][positionY]);
                 for (int j=0;j<listQuestion.size();j++) {
@@ -198,6 +205,7 @@ public class GridviewAdapter extends BaseAdapter {
                     int startX = wordObject.startX;
                     int startY = wordObject.startY;
                     if (wordObject.startY == positionY&&wordObject.getOrientation()==WordObject.HORIZONTAL) {
+
                         for (int i = 0; i < answerQuestion.length(); i++) {
                              if (!data[startX + i][startY].equals(answerQuestion.substring(i, i + 1))) {
                                 checkAnswer = false;

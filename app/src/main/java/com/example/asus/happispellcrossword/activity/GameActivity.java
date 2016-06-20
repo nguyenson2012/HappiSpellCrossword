@@ -150,14 +150,14 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
             Button button=(Button)findViewById(arrayButtonKeyboard[i]);
             listKeyboard.add(button);
         }
-        btCheckAnswer=(Button)findViewById(R.id.btCheckAnswer);
+        /*btCheckAnswer=(Button)findViewById(R.id.btCheckAnswer);
         btCheckAnswer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(checkAnswer())
                     increaseLevel();
             }
-        });
+        });*/
     }
 
     private void initializeQuestion() {

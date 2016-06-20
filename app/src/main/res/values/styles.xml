@@ -27,4 +27,8 @@
     <style name="BlueButton" parent="FlashCardButton">
         <item name="android:background">@drawable/btn_blue</item>
     </style>
+
+    <style name="YellowButton" parent="FlashCardButton">
+        <item name="android:background">@drawable/btn_yellow_cell</item>
+    </style>
 </resources>
