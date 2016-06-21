@@ -3,20 +3,26 @@
     android:orientation="vertical"
     android:layout_width="320dp"
     android:layout_height="200dp"
-    android:background="@drawable/greatjob">
+    android:background="@drawable/great_job_round_corner">
     <Button
         android:id="@+id/buttonLevel"
         android:layout_width="@dimen/button_level_size"
         android:layout_height="@dimen/button_level_size"
         android:text="Level"
         android:textSize="@dimen/text_size"
-        android:layout_alignParentBottom="true" />
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/btn_yellow_cell"
+        android:layout_marginBottom="@dimen/bt_level_margin_bottom"
+        android:layout_marginLeft="@dimen/bt_level_margin_left"/>
     <Button
         android:id="@+id/buttonNextLevel"
         android:layout_width="@dimen/button_level_size"
         android:layout_height="@dimen/button_level_size"
         android:text="Next"
         android:textSize="@dimen/text_size"
+        android:background="@drawable/btn_yellow_cell"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"/>
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="@dimen/bt_level_margin_bottom"
+        android:layout_marginRight="@dimen/bt_level_margin_right"/>
 </RelativeLayout>

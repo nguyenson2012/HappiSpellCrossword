@@ -112,7 +112,9 @@
         android:layout_weight="2"
         android:layout_height="match_parent"
         android:horizontalSpacing="1dp"
-        android:verticalSpacing="1dp"></GridView>
+        android:verticalSpacing="1dp"
+        android:layout_marginTop="@dimen/gridview_margin_top"
+        android:layout_marginBottom="@dimen/gridview_margin_top"></GridView>
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
