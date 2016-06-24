@@ -127,6 +127,7 @@ public class DBHelper extends SQLiteOpenHelper {
             WordObject wordObject=new WordObject();
             int stagePosition=res.getInt(res.getColumnIndex(QUESTION_STAGE_POSITION));
             if(stagePosition==positionStage){
+                wordObject.setStagePosition(positionStage);
                 wordObject.setQuestion(res.getString(res.getColumnIndex(QUESTION_QUIZ)));
                 wordObject.setResult(res.getString(res.getColumnIndex(QUESTION_RESULT)));
                 wordObject.setImageLink(res.getString(res.getColumnIndex(QUESTION_IMG_LINK)));
@@ -163,10 +164,9 @@ public class DBHelper extends SQLiteOpenHelper {
         contentValues.put(QUESTION_STARTX,wordObject.startX);
         contentValues.put(QUESTION_STARTY,wordObject.startY);
         contentValues.put(QUESTION_POSITION,wordObject.getPosition());
-        if(db.update(QUESTION_TABLE_NAME, contentValues, QUESTION_STAGE_POSITION + "=?", new String[]{Integer.toString(stagePosition)})!=0)
+        if(db.update(QUESTION_TABLE_NAME, contentValues, QUESTION_STAGE_POSITION + "=? AND "+QUESTION_POSITION+"=?", new String[]{Integer.toString(stagePosition),Integer.toString(wordObject.getPosition())})!=0)
             return true;
         else
             return false;
-
     }
 }

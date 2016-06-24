@@ -21,6 +21,7 @@ public class SoundEffect implements MediaPlayer.OnPreparedListener{
             mediaPlayer.release();
         }
         mediaPlayer=MediaPlayer.create(activity, R.raw.incorrect);
+        mediaPlayer.setLooping(false);
         mediaPlayer.setOnPreparedListener(this);
     }
     public void playCorrectWord(Activity activity,MediaPlayer mediaPlayer){
@@ -28,6 +29,7 @@ public class SoundEffect implements MediaPlayer.OnPreparedListener{
             mediaPlayer.release();
         }
         mediaPlayer=MediaPlayer.create(activity, R.raw.right_answer);
+        mediaPlayer.setLooping(false);
         mediaPlayer.setOnPreparedListener(this);
     }
     public void playLevelDone(Activity activity,MediaPlayer mediaPlayer){
@@ -35,6 +37,7 @@ public class SoundEffect implements MediaPlayer.OnPreparedListener{
             mediaPlayer.release();
         }
         mediaPlayer=MediaPlayer.create(activity, R.raw.done_level);
+        mediaPlayer.setLooping(false);
         mediaPlayer.setOnPreparedListener(this);
     }
     public void playStartSound(Activity activity,MediaPlayer mediaPlayer){
@@ -43,6 +46,7 @@ public class SoundEffect implements MediaPlayer.OnPreparedListener{
         }
         mediaPlayer=MediaPlayer.create(activity, R.raw.happiness);
         mediaPlayer.setOnPreparedListener(this);
+        mediaPlayer.setLooping(true);
     }
     public void playSplashSound(Activity activity,MediaPlayer mediaPlayer){
         if(mediaPlayer!=null){

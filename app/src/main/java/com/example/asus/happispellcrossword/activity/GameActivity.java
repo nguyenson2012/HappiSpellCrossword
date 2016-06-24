@@ -13,6 +13,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
+import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -40,6 +41,7 @@ import com.example.asus.happispellcrossword.model.StaticVariable;
 import com.example.asus.happispellcrossword.model.WordObject;
 import com.example.asus.happispellcrossword.model.WordObjectsManager;
 import com.example.asus.happispellcrossword.utils.DBHelper;
+import com.example.asus.happispellcrossword.utils.SoundEffect;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
@@ -54,7 +56,7 @@ import java.util.ArrayList;
 /**
  * Created by Asus on 6/8/2016.
  */
-public class GameActivity extends Activity implements GridviewAdapter.ChangeLevelInterface{
+public class GameActivity extends Activity implements GridviewAdapter.ChangeLevelInterface,MediaPlayer.OnPreparedListener{
     public static final int AD_HEIGHT = 50;
     public static final int NUM_OF_COLLUMN = 10;
     public static final int NUM_OF_ROW = NUM_OF_COLLUMN;
@@ -94,6 +96,7 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
             R.id.bt_answer_P,R.id.bt_answer_Q,R.id.bt_answer_R,R.id.bt_answer_S,R.id.bt_answer_T,R.id.bt_answer_U,
             R.id.bt_answer_V,R.id.bt_answer_W,R.id.bt_answer_X,R.id.bt_answer_Y,R.id.bt_answer_Z};
     private DBHelper database;
+    private MediaPlayer mediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +104,7 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        playSoundBackroud();
         database=new DBHelper(this);
         staticVariable = StaticVariable.getInstance();
         getLevelPosition();
@@ -125,6 +129,12 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
             BTN_KEYBOARD_MARGIN_LEFT_AND_RIGHT = temp/8; // If need to adjust, change here
             BTN_KEYBOARD_EDGE_SIZE = temp-2*BTN_KEYBOARD_MARGIN_LEFT_AND_RIGHT;
         }*/
+    }
+
+    private void playSoundBackroud(){
+        mediaPlayer=MediaPlayer.create(GameActivity.this,R.raw.level_action);
+        mediaPlayer.setLooping(true);
+        mediaPlayer.setOnPreparedListener(this);
     }
 
     private void getdoneLevel() {
@@ -294,6 +304,7 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
 //
 //            AlertDialog alertDialog = alertDialogBuilder.create();
 //            alertDialog.show();
+        SoundEffect.getInstance().playLevelDone(GameActivity.this,mediaPlayer);
         final Dialog dialog=new Dialog(GameActivity.this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_next_level);
@@ -336,6 +347,11 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
             editor.putInt(StaticVariable.CURRENT_LEVEL,currentLevel);
             editor.commit();
         }
+    }
+
+    @Override
+    public void onPrepared(MediaPlayer mp) {
+        mp.start();
     }
 
     private final class ChoiceTouchListener implements View.OnTouchListener {

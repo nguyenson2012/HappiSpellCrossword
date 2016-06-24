@@ -1,5 +1,6 @@
 package com.example.asus.happispellcrossword.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
@@ -29,7 +30,7 @@ import java.util.ArrayList;
 /**
  * Created by Asus on 6/8/2016.
  */
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends Activity {
     int column = 2;
     int spacing = 0;
     boolean includeEdge = false;
@@ -59,6 +60,12 @@ public class HomeActivity extends AppCompatActivity {
         registerEvent();
         if(!checkAlreadyDatabase())
             setupDatabse();
+        playSoundBackGround();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         playSoundBackGround();
     }
 

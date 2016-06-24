@@ -28,6 +28,7 @@ import com.example.asus.happispellcrossword.activity.GameActivity;
 import com.example.asus.happispellcrossword.model.WordObject;
 import com.example.asus.happispellcrossword.model.WordObjectsManager;
 import com.example.asus.happispellcrossword.utils.SoundEffect;
+import com.example.asus.happispellcrossword.utils.TextToSpeechUtil;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -65,6 +66,8 @@ public class GridviewAdapter extends BaseAdapter {
     private ImageLoader imageLoader;
     private MediaPlayer mediaPlayer;
     private ArrayList<WordObject> listQuestion=new ArrayList<WordObject>();
+    private TextToSpeechUtil textToSpeechUtil;
+    private String answerQuestion;
     private static boolean isQuestionAnimation[];
     int positionNewX,positionNewY;
     boolean isNotifyDoneLevel=false;
@@ -76,6 +79,7 @@ public class GridviewAdapter extends BaseAdapter {
         this.context = context;
         this.data = data;
         this.changeLevelListener=(ChangeLevelInterface)context;
+        textToSpeechUtil=TextToSpeechUtil.getInst(context);
         setupAnswer();
         isQuestionAnimation=new boolean[listQuestion.size()];
         for(int i=0;i<listQuestion.size();i++)
@@ -220,7 +224,7 @@ public class GridviewAdapter extends BaseAdapter {
                 cell.setText(data[positionX][positionY]);
                 for (int j=0;j<listQuestion.size();j++) {
                     WordObject wordObject=listQuestion.get(j);
-                    String answerQuestion = wordObject.getResult();
+                    answerQuestion = wordObject.getResult();
                     int startX = wordObject.startX;
                     int startY = wordObject.startY;
                     if (wordObject.startY == positionY&&wordObject.getOrientation()==WordObject.HORIZONTAL) {
@@ -275,6 +279,7 @@ public class GridviewAdapter extends BaseAdapter {
         for(int i=0;i<imageLocation.length;i++)
         {
             int imgLocation=imageLocation[i];
+            answerQuestion=listQuestion.get(i).getResult();
             if(position==imgLocation)//if this is the image cell
             {
                 //cell.setBackgroundResource(R.drawable.ic_action_word);
@@ -288,6 +293,7 @@ public class GridviewAdapter extends BaseAdapter {
                 cell.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        speakAnswer(positionX,positionY);
                         Animation animationScale = AnimationUtils.loadAnimation(context, R.anim.scale);
                         gridView.startAnimation(animationScale);
                     }
@@ -295,6 +301,17 @@ public class GridviewAdapter extends BaseAdapter {
             }
         }
         return gridView;
+    }
+
+    private void speakAnswer(int positionX, int positionY) {
+        String word="";
+        for(WordObject wordObject:listQuestion){
+            if(wordObject.startX==positionX&&wordObject.getOrientation()==WordObject.VERTICAL&&positionY==wordObject.startY+wordObject.getResult().length())
+                word=wordObject.getResult();
+            if(wordObject.startY==positionY&&wordObject.getOrientation()==WordObject.HORIZONTAL&&positionX==wordObject.startX+wordObject.getResult().length())
+                word=wordObject.getResult();
+        }
+        textToSpeechUtil.speakWordOrSentence(word.toLowerCase());
     }
 
     private void settingAnimation() {
