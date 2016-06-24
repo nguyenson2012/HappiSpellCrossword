@@ -8,6 +8,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.MediaPlayer;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ import android.view.animation.LinearInterpolator;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +27,7 @@ import com.example.asus.happispellcrossword.R;
 import com.example.asus.happispellcrossword.activity.GameActivity;
 import com.example.asus.happispellcrossword.model.WordObject;
 import com.example.asus.happispellcrossword.model.WordObjectsManager;
+import com.example.asus.happispellcrossword.utils.SoundEffect;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -50,7 +53,7 @@ public class GridviewAdapter extends BaseAdapter {
     ObjectAnimator scaleAnimationX = new ObjectAnimator();
     ObjectAnimator scaleAnimationY = new ObjectAnimator();
     WordObjectsManager objManager = WordObjectsManager.getInstance();
-    private Context context;
+    private Activity context;
     private ChangeLevelInterface changeLevelListener;
     private String data[][];//The board must be rectangular + data[x][y]
     private String answer[][];
@@ -60,9 +63,12 @@ public class GridviewAdapter extends BaseAdapter {
     private Animation animation;
     private DisplayImageOptions opt;
     private ImageLoader imageLoader;
+    private MediaPlayer mediaPlayer;
     private ArrayList<WordObject> listQuestion=new ArrayList<WordObject>();
     private static boolean isQuestionAnimation[];
+    int positionNewX,positionNewY;
     boolean isNotifyDoneLevel=false;
+    boolean isAddnewButton=false;
 
     public GridviewAdapter(Activity context, String[][] data) {
 //        this.gridViewClickListener = (OnItemGridViewClick) context;
@@ -172,22 +178,31 @@ public class GridviewAdapter extends BaseAdapter {
 
         final Button cell = (Button) gridView.findViewById(R.id.button);
         final TextView textViewNumberQuestion = (TextView) gridView.findViewById(R.id.tvItemSTT);
+        final RelativeLayout backGround = (RelativeLayout) gridView.findViewById(R.id.BGLinear2);
 
-//        //set Row Height
-//        DisplayMetrics metrics = new DisplayMetrics();
-//        metrics = context.getResources().getDisplayMetrics();
-//        cell.setMinimumHeight(0);
-////        cell.setHeight(MainActivity.getRowHeight());
-//        cell.setHeight((int) ((metrics.widthPixels / GameActivity.NUM_OF_ROW) * 0.9));
+        //set Row Height
+        DisplayMetrics metrics = new DisplayMetrics();
+        metrics = context.getResources().getDisplayMetrics();
+        ViewGroup.LayoutParams paramLayoutImage = cell.getLayoutParams();
+        int cellsize=(int)(metrics.heightPixels/10*0.9);
+        paramLayoutImage.width = cellsize;
+        paramLayoutImage.height=cellsize;
+        cell.setLayoutParams(paramLayoutImage);
+        cell.setTextSize((float) (metrics.heightPixels/45));
 
         cell.setTextColor(Color.BLACK);
         final int positionX = position % GameActivity.NUM_OF_COLLUMN;
         final int positionY = position / GameActivity.NUM_OF_ROW;
         if(data[positionX][positionY]==GridviewAdapter.DISABLE){
-            cell.setVisibility(View.INVISIBLE);
+            cell.setClickable(false);
             cell.setFocusable(false);
             cell.setEnabled(false);
-            cell.setClickable(false);
+            cell.setBackgroundColor(Color.TRANSPARENT);
+            backGround.setBackgroundColor(Color.TRANSPARENT);
+            gridView.setEnabled(false);
+            gridView.setFocusable(false);
+            gridView.setClickable(false);
+            isAnimation[positionX][positionY] = true;
         }else {
                 //show number of question on cell
                 if (listQuestion.size() > 0) {
@@ -197,6 +212,10 @@ public class GridviewAdapter extends BaseAdapter {
                 }
 
                 if(data[positionX][positionY].equals(answer[positionX][positionY])) {
+                if(positionNewX==positionX&&positionNewY==positionY&&isAddnewButton){
+                    SoundEffect.getInstance().playCorrectWord(context, mediaPlayer);
+                    isAddnewButton=false;
+                }
                 boolean checkAnswer=true;
                 cell.setText(data[positionX][positionY]);
                 for (int j=0;j<listQuestion.size();j++) {
@@ -244,7 +263,12 @@ public class GridviewAdapter extends BaseAdapter {
                     }
                     checkAnswer=true;
                 }
-            }
+            }else {
+                    if(positionNewX==positionX&&positionNewY==positionY&&isAddnewButton){
+                        SoundEffect.getInstance().playWrongWord(context,mediaPlayer);
+                        isAddnewButton=false;
+                    }
+                }
         }
 
         //Setup Image cells
@@ -314,6 +338,14 @@ public class GridviewAdapter extends BaseAdapter {
 
         }
         return checkAnswer;
+    }
+
+    public void addNewButton(){
+        isAddnewButton=true;
+    }
+    public void setNewPosition(int positonX,int positionY){
+        positionNewX=positonX;
+        positionNewY=positionY;
     }
 
     public interface ChangeLevelInterface{

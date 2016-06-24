@@ -11,8 +11,8 @@
     <Button
         android:id="@+id/button"
         android:layout_gravity="center"
-        android:layout_width="@dimen/button_grid_puzzle_size"
-        android:layout_height="@dimen/button_grid_puzzle_size"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:textSize="15dp"
         style="@style/BlueButton"
         android:layout_margin="1dp"/>

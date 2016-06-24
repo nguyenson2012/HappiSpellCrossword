@@ -31,4 +31,12 @@
     <style name="YellowButton" parent="FlashCardButton">
         <item name="android:background">@drawable/btn_yellow_cell</item>
     </style>
+    <style name="dialog_animation">
+        <item name="android:windowEnterAnimation">@anim/dialog_enter</item>
+
+
+        <item name="android:windowExitAnimation">@anim/zoom_exit</item>
+
+
+    </style>
 </resources>

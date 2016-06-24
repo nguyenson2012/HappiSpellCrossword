@@ -49,6 +49,7 @@ public class GridViewLevelAdapter extends RecyclerView.Adapter<RecyclerViewHolde
             holder.textViewTimeComplete.setText("");
         holder.textViewTimeComplete.setText(stageItems.get(position).getSecondComplete() + "s");
         holder.textViewDescription.setText(stageItems.get(position).getDescriptionStage());
+
     }
 
     @Override

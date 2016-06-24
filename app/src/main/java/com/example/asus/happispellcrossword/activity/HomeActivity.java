@@ -2,6 +2,7 @@ package com.example.asus.happispellcrossword.activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -11,6 +12,8 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 import com.example.asus.happispellcrossword.R;
 import com.example.asus.happispellcrossword.adapter.GridSpacingItemDecoration;
@@ -19,6 +22,7 @@ import com.example.asus.happispellcrossword.adapter.RecyclerItemClickListener;
 import com.example.asus.happispellcrossword.model.Stage;
 import com.example.asus.happispellcrossword.model.StaticVariable;
 import com.example.asus.happispellcrossword.utils.DBHelper;
+import com.example.asus.happispellcrossword.utils.SoundEffect;
 
 import java.util.ArrayList;
 
@@ -38,6 +42,7 @@ public class HomeActivity extends AppCompatActivity {
     private int doneLevel = 0;
     private StaticVariable staticVariable;
     private DBHelper databse;
+    private MediaPlayer mediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +59,11 @@ public class HomeActivity extends AppCompatActivity {
         registerEvent();
         if(!checkAlreadyDatabase())
             setupDatabse();
+        playSoundBackGround();
+    }
+
+    private void playSoundBackGround() {
+        SoundEffect.getInstance().playStartSound(HomeActivity.this, mediaPlayer);
     }
 
     private void setupDatabse() {
@@ -106,17 +116,37 @@ public class HomeActivity extends AppCompatActivity {
     private void registerEvent() {
         recyclerViewLevel.addOnItemTouchListener(new RecyclerItemClickListener(HomeActivity.this, new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
-                    public void onItemClick(View view, int position) {
+                    public void onItemClick(final View view, final int position) {
                         if (position < doneLevel+1) {
                             // TODO Handle item click
-                            Intent intent = new Intent(HomeActivity.this, GameActivity.class);
-                            intent.putExtra("levelposition", position + 1);
-                            startActivity(intent);
+                            Animation animationHorizontalScale = AnimationUtils.loadAnimation(HomeActivity.this, R.anim.horizontal_scale);
+                            animationHorizontalScale.setAnimationListener(new Animation.AnimationListener() {
+                                @Override
+                                public void onAnimationStart(Animation animation) {
+                                }
+
+                                @Override
+                                public void onAnimationEnd(Animation animation) {
+                                    Intent intent = new Intent(HomeActivity.this, GameActivity.class);
+                                    intent.putExtra("levelposition", position + 1);
+                                    startActivity(intent);
+                                    overridePendingTransition(R.anim.zoom_enter, R.anim.zoom_exit);
+                                }
+
+                                @Override
+                                public void onAnimationRepeat(Animation animation) {
+
+                                }
+                            });
+                            view.startAnimation(animationHorizontalScale);
+
+
                         }
                     }
                 })
         );
     }
+
 
     private void setAdapterForRecyclerView() {
         DisplayMetrics metrics = new DisplayMetrics();

@@ -10,7 +10,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -311,6 +313,8 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
                 increaseLevel();
             }
         });
+        dialog.getWindow().getAttributes().windowAnimations=R.style.dialog_animation;
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
     }
 
@@ -377,6 +381,8 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
                         int positionX=newPosition%GameActivity.NUM_OF_COLLUMN;
                         int positionY=newPosition/GameActivity.NUM_OF_COLLUMN;
                         gridViewData[positionX][positionY]=droppedButton.getText()+"";
+                        adapter.addNewButton();
+                        adapter.setNewPosition(positionX,positionY);
                         adapter.notifyDataSetChanged();
                         gridView.invalidateViews();
                     }
@@ -391,6 +397,9 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
         }
     }
 
-
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.zoom_enter,R.anim.zoom_exit);
+    }
 }
