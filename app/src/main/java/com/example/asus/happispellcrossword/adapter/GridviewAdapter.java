@@ -9,7 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,15 +17,14 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.asus.happispellcrossword.R;
 import com.example.asus.happispellcrossword.activity.GameActivity;
 import com.example.asus.happispellcrossword.model.WordObject;
 import com.example.asus.happispellcrossword.model.WordObjectsManager;
+import com.example.asus.happispellcrossword.utils.LayoutUtils;
 import com.example.asus.happispellcrossword.utils.SoundEffect;
 import com.example.asus.happispellcrossword.utils.TextToSpeechUtil;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
@@ -72,12 +70,14 @@ public class GridviewAdapter extends BaseAdapter {
     int positionNewX,positionNewY;
     boolean isNotifyDoneLevel=false;
     boolean isAddnewButton=false;
+    private LayoutUtils layoutUtils;
 
     public GridviewAdapter(Activity context, String[][] data) {
 //        this.gridViewClickListener = (OnItemGridViewClick) context;
         isNotifyDoneLevel=false;
         this.context = context;
         this.data = data;
+        layoutUtils = LayoutUtils.getInstance(context);
         this.changeLevelListener=(ChangeLevelInterface)context;
         textToSpeechUtil=TextToSpeechUtil.getInst(context);
         setupAnswer();
@@ -102,7 +102,8 @@ public class GridviewAdapter extends BaseAdapter {
             }else
                 imageLocation[i]=wordObject.startX+(wordObject.startY+wordObject.getResult().length())*10;
             //NOT DISABLE image cell
-            this.data[imageLocation[i]%GameActivity.NUM_OF_COLLUMN][imageLocation[i]/GameActivity.NUM_OF_ROW] = ENABLE;
+            this.data[imageLocation[i]%layoutUtils.getNumOfGridCollumn()]
+                    [imageLocation[i]/layoutUtils.getNumOfGridRow()] = ENABLE;
         }
         initImageLoader(context);
         setupImageDisplayOptions();
@@ -135,7 +136,7 @@ public class GridviewAdapter extends BaseAdapter {
 
 
     private void setupAnswer() {
-        answer=new String[GameActivity.NUM_OF_COLLUMN][GameActivity.NUM_OF_COLLUMN];
+        answer=new String[layoutUtils.getNumOfGridCollumn()][layoutUtils.getNumOfGridRow()];
         this.listQuestion=objManager.getObjectArrayList();
         for(WordObject wordObject:listQuestion){
             String answerQuestion=wordObject.getResult();
@@ -185,18 +186,22 @@ public class GridviewAdapter extends BaseAdapter {
         final RelativeLayout backGround = (RelativeLayout) gridView.findViewById(R.id.BGLinear2);
 
         //set Row Height
-        DisplayMetrics metrics = new DisplayMetrics();
-        metrics = context.getResources().getDisplayMetrics();
         ViewGroup.LayoutParams paramLayoutImage = cell.getLayoutParams();
-        int cellsize=(int)(metrics.heightPixels/10*0.9);
-        paramLayoutImage.width = cellsize;
-        paramLayoutImage.height=cellsize;
+//        DisplayMetrics metrics = new DisplayMetrics();
+//        metrics = context.getResources().getDisplayMetrics();
+//        int cellsize=(int)(metrics.heightPixels/10*0.9);
+//        paramLayoutImage.width = cellsize;
+//        paramLayoutImage.height= cellsize;
+//        cell.setTextSize((float) (metrics.heightPixels/45));
+//        cell.setTextColor(Color.BLACK);
+        paramLayoutImage.width = layoutUtils.getCellWidth();
+        paramLayoutImage.height= layoutUtils.getCellHeight();
+        cell.setTextSize(layoutUtils.getCellTextSize());
+        cell.setTextColor(layoutUtils.getCellTextColor());
         cell.setLayoutParams(paramLayoutImage);
-        cell.setTextSize((float) (metrics.heightPixels/45));
 
-        cell.setTextColor(Color.BLACK);
-        final int positionX = position % GameActivity.NUM_OF_COLLUMN;
-        final int positionY = position / GameActivity.NUM_OF_ROW;
+        final int positionX = position % layoutUtils.getNumOfGridCollumn();
+        final int positionY = position / layoutUtils.getNumOfGridRow();
         if(data[positionX][positionY]==GridviewAdapter.DISABLE){
             cell.setClickable(false);
             cell.setFocusable(false);

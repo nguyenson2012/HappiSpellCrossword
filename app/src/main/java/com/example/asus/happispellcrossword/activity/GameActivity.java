@@ -1,39 +1,26 @@
 package com.example.asus.happispellcrossword.activity;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ClipData;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.GridView;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.asus.happispellcrossword.R;
 import com.example.asus.happispellcrossword.adapter.GridviewAdapter;
@@ -41,15 +28,11 @@ import com.example.asus.happispellcrossword.model.StaticVariable;
 import com.example.asus.happispellcrossword.model.WordObject;
 import com.example.asus.happispellcrossword.model.WordObjectsManager;
 import com.example.asus.happispellcrossword.utils.DBHelper;
+import com.example.asus.happispellcrossword.utils.LayoutUtils;
 import com.example.asus.happispellcrossword.utils.SoundEffect;
-import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
-import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 import java.util.ArrayList;
 
@@ -58,20 +41,20 @@ import java.util.ArrayList;
  */
 public class GameActivity extends Activity implements GridviewAdapter.ChangeLevelInterface,MediaPlayer.OnPreparedListener{
     public static final int AD_HEIGHT = 50;
-    public static final int NUM_OF_COLLUMN = 10;
-    public static final int NUM_OF_ROW = NUM_OF_COLLUMN;
+//    public static final int NUM_OF_GRID_COLLUMN = 10;
+//    public static final int NUM_OF_GRID_ROW = NUM_OF_GRID_COLLUMN;
 //    public static final int MAX_NUM_OF_KEYBOARD_BTN_PER_ROW = 10;
     private static GridView gridView;
     //    public int PARENT_VERTICAL_MARGIN;
     private int LINE_HEIGHT;
 //    private int BTN_KEYBOARD_MARGIN_LEFT_AND_RIGHT;
 //    private int BTN_KEYBOARD_EDGE_SIZE;
-    private int screenWidth = 0;
-    private int screenHeight = 0;
+//    private int screenWidth = 0;
+//    private int screenHeight = 0;
 //    private TextView txtView_question;
 //    private ImageView imgView_question;
 //    private ImageButton del_btn;
-    private String[][] gridViewData = new String[NUM_OF_COLLUMN][NUM_OF_ROW];//gridViewData[x][y]
+    private String[][] gridViewData;
     private WordObjectsManager objManger = WordObjectsManager.getInstance();
     private GridviewAdapter adapter;
 //    private ImageButton btCheckAnswer;
@@ -97,6 +80,7 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
             R.id.bt_answer_V,R.id.bt_answer_W,R.id.bt_answer_X,R.id.bt_answer_Y,R.id.bt_answer_Z};
     private DBHelper database;
     private MediaPlayer mediaPlayer;
+    private LayoutUtils layoutUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,14 +91,16 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
         playSoundBackroud();
         database=new DBHelper(this);
         staticVariable = StaticVariable.getInstance();
+        layoutUtils = LayoutUtils.getInstance(this);
+        gridViewData = new String[layoutUtils.getNumOfGridCollumn()][layoutUtils.getNumOfGridRow()];//gridViewData[x][y]
         getLevelPosition();
         getdoneLevel();
         timeStartLevel = (int) (System.currentTimeMillis() / 1000);
 //        context = this;
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        screenWidth = metrics.widthPixels;
-        screenHeight = metrics.heightPixels;
+//        screenWidth = layoutUtils.getScreenWidth();
+//        screenHeight = layoutUtils.getScreenHeight();
         setupKeyboard();
         setupGridView();
         registerEvent();
@@ -132,9 +118,9 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
     }
 
     private void playSoundBackroud(){
-        mediaPlayer=MediaPlayer.create(GameActivity.this,R.raw.level_action);
-        mediaPlayer.setLooping(true);
-        mediaPlayer.setOnPreparedListener(this);
+//        mediaPlayer=MediaPlayer.create(GameActivity.this,R.raw.level_action);
+//        mediaPlayer.setLooping(true);
+//        mediaPlayer.setOnPreparedListener(this);
     }
 
     private void getdoneLevel() {
@@ -160,6 +146,12 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
     private void setupKeyboard() {
         for(int i=0;i<arrayButtonKeyboard.length;i++){
             Button button=(Button)findViewById(arrayButtonKeyboard[i]);
+            LinearLayout.LayoutParams paramLayoutButton = (LinearLayout.LayoutParams)button.getLayoutParams();
+            paramLayoutButton.width = layoutUtils.getCellWidth();
+            paramLayoutButton.height= layoutUtils.getCellHeight();
+            paramLayoutButton.setMargins(layoutUtils.getKeyboardMargin(),layoutUtils.getKeyboardMargin()
+                    ,layoutUtils.getKeyboardMargin(),layoutUtils.getKeyboardMargin());
+            button.setLayoutParams(paramLayoutButton);
             listKeyboard.add(button);
         }
         /*btCheckAnswer=(Button)findViewById(R.id.btCheckAnswer);
@@ -182,7 +174,7 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
     private void setupGridView() {
         initializeQuestion();
         //Reset gridview
-        gridViewData = new String[NUM_OF_COLLUMN][NUM_OF_ROW];
+        gridViewData = new String[layoutUtils.getNumOfGridCollumn()][layoutUtils.getNumOfGridRow()];
         for (int i = 0; i < gridViewData[0].length; i++) {
             for (int j = 0; j < gridViewData[0].length; j++)//the board is rectangular
             {
@@ -200,11 +192,11 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
         adapter = new GridviewAdapter(this, gridViewData);
 //        adapter.setUpListWord(objManger.getObjectArrayList());
         gridView = (GridView) findViewById(R.id.gridview_puzzle);
-        gridView.setMinimumHeight(screenWidth);
+//        gridView.setMinimumHeight(layoutUtils.getScreenWidth());
         gridView.setAdapter(adapter);
-        gridView.setNumColumns(NUM_OF_COLLUMN);
-//        gridView.setColumnWidth((int) ((gridView.getWidth() / NUM_OF_COLLUMN) * 0.9));
-        gridView.setMinimumWidth(screenWidth);
+        gridView.setNumColumns(layoutUtils.getNumOfGridCollumn());
+//        gridView.setColumnWidth((int) ((gridView.getWidth() / NUM_OF_GRID_COLLUMN) * 0.9));
+//        gridView.setMinimumWidth(layoutUtils.getScreenWidth());
     }
 
     @Override
@@ -231,8 +223,8 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
 
     /*//    @Override
     public void onItemGridViewClick(int position) {
-        int positionX = position % NUM_OF_COLLUMN;
-        int positionY = position / NUM_OF_COLLUMN;}*/
+        int positionX = position % NUM_OF_GRID_COLLUMN;
+        int positionY = position / NUM_OF_GRID_COLLUMN;}*/
 
     private boolean checkAnswer() {
         boolean checkAnswer = true;
@@ -394,8 +386,8 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
                     //view being dragged and dropped
                     Button droppedButton = (Button) view;
                     if(newPosition!=GridView.INVALID_POSITION) {
-                        int positionX=newPosition%GameActivity.NUM_OF_COLLUMN;
-                        int positionY=newPosition/GameActivity.NUM_OF_COLLUMN;
+                        int positionX=newPosition%LayoutUtils.getNumOfGridCollumn();
+                        int positionY=newPosition/LayoutUtils.getNumOfGridCollumn();
                         gridViewData[positionX][positionY]=droppedButton.getText()+"";
                         adapter.addNewButton();
                         adapter.setNewPosition(positionX,positionY);
