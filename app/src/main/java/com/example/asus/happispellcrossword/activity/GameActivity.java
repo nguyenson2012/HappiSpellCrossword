@@ -10,6 +10,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,6 +22,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.example.asus.happispellcrossword.R;
 import com.example.asus.happispellcrossword.adapter.GridviewAdapter;
@@ -197,6 +199,25 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
         gridView.setNumColumns(layoutUtils.getNumOfGridCollumn());
 //        gridView.setColumnWidth((int) ((gridView.getWidth() / NUM_OF_GRID_COLLUMN) * 0.9));
 //        gridView.setMinimumWidth(layoutUtils.getScreenWidth());
+        /*int tempWidth = (int) (layoutUtils.getScreenWidth()*layoutUtils.getPercentGridWeight());
+        int tempHeight = layoutUtils.getScreenHeight();
+        LinearLayout.LayoutParams paramLayoutGridView = (LinearLayout.LayoutParams)gridView.getLayoutParams();
+        //Make grid a square
+        if(tempHeight<=tempWidth)
+        {
+            paramLayoutGridView.width = tempHeight;
+            paramLayoutGridView.height = tempHeight;
+            Log.e("LOL","tempHeight <= tempWidth");
+        }
+        else
+        {
+            paramLayoutGridView.width = tempWidth;
+            paramLayoutGridView.height = tempWidth;
+            Log.e("LOL","tempHeight > tempWidth");
+        }
+        Log.e("LOL","Width = "+paramLayoutGridView.width+" , height = "+paramLayoutGridView.height);
+        paramLayoutGridView.setMargins(0,0,0,0);
+        gridView.setLayoutParams(paramLayoutGridView);*/
     }
 
     @Override

@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -167,6 +169,17 @@ public class GridviewAdapter extends BaseAdapter {
         return 0;
     }
 
+    //Unable to click cell not contain words
+    @Override
+    public boolean isEnabled(int position) {
+        final int positionX = position % layoutUtils.getNumOfGridCollumn();
+        final int positionY = position / layoutUtils.getNumOfGridRow();
+        if(data[positionX][positionY]==GridviewAdapter.DISABLE) {
+            return false;
+        }
+        return true;
+    }
+
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         // LayoutInflater to call external grid_item.xml file
@@ -186,31 +199,34 @@ public class GridviewAdapter extends BaseAdapter {
         final RelativeLayout backGround = (RelativeLayout) gridView.findViewById(R.id.BGLinear2);
 
         //set Row Height
-        ViewGroup.LayoutParams paramLayoutImage = cell.getLayoutParams();
+        RelativeLayout.LayoutParams paramLayoutCell = (RelativeLayout.LayoutParams)cell.getLayoutParams();
 //        DisplayMetrics metrics = new DisplayMetrics();
 //        metrics = context.getResources().getDisplayMetrics();
 //        int cellsize=(int)(metrics.heightPixels/10*0.9);
-//        paramLayoutImage.width = cellsize;
-//        paramLayoutImage.height= cellsize;
+//        paramLayoutCell.width = cellsize;
+//        paramLayoutCell.height= cellsize;
 //        cell.setTextSize((float) (metrics.heightPixels/45));
 //        cell.setTextColor(Color.BLACK);
-        paramLayoutImage.width = layoutUtils.getCellWidth();
-        paramLayoutImage.height= layoutUtils.getCellHeight();
+
+        paramLayoutCell.width = layoutUtils.getCellWidth();
+        paramLayoutCell.height= layoutUtils.getCellHeight();
+        paramLayoutCell.setMargins(layoutUtils.getCellMargin(), layoutUtils.getCellMargin()
+                , layoutUtils.getCellMargin(), layoutUtils.getCellMargin());
         cell.setTextSize(layoutUtils.getCellTextSize());
         cell.setTextColor(layoutUtils.getCellTextColor());
-        cell.setLayoutParams(paramLayoutImage);
+        cell.setLayoutParams(paramLayoutCell);
 
         final int positionX = position % layoutUtils.getNumOfGridCollumn();
         final int positionY = position / layoutUtils.getNumOfGridRow();
         if(data[positionX][positionY]==GridviewAdapter.DISABLE){
-            cell.setClickable(false);
-            cell.setFocusable(false);
+//            cell.setClickable(false);
+//            cell.setFocusable(false);
             cell.setEnabled(false);
-            cell.setBackgroundColor(Color.TRANSPARENT);
-            backGround.setBackgroundColor(Color.TRANSPARENT);
-            gridView.setEnabled(false);
-            gridView.setFocusable(false);
-            gridView.setClickable(false);
+//            cell.setBackgroundColor(Color.TRANSPARENT);
+//            backGround.setBackgroundColor(Color.TRANSPARENT);
+//            gridView.setEnabled(false);
+//            gridView.setFocusable(false);
+//            gridView.setClickable(false);
             isAnimation[positionX][positionY] = true;
         }else {
                 //show number of question on cell

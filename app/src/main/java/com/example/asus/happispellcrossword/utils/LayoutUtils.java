@@ -21,6 +21,9 @@ public class LayoutUtils {
 
     private static final int NUM_OF_GRID_COLLUMN = 10;
     private static final int NUM_OF_GRID_ROW = NUM_OF_GRID_COLLUMN;
+    private static final int MAX_KEYBOARD_PER_ROW = 3;
+    private static final float PERCENT_KEYBOARD_WEIGHT = 0.2f;
+    private static final float PERCENT_GRID_WEIGHT = 0.6f;
     private DisplayMetrics metrics = new DisplayMetrics();
     private static Context context;
     private int screenWidth;
@@ -29,6 +32,7 @@ public class LayoutUtils {
     private int cellHeight;
     private int cellTextSize;
     private int cellTextColor;
+    private int cellMargin;
     private int keyboardWidth;
     private int keyboardHeight;
     private int keyboardTextSize;
@@ -47,10 +51,12 @@ public class LayoutUtils {
 
     private void setupGrid()
     {
-        cellHeight = (int)(screenHeight/10*0.9);
+        cellMargin = 2;
+        cellHeight = (int)((screenHeight - cellMargin*NUM_OF_GRID_ROW*2)/10 );
         cellWidth = cellHeight;
         cellTextSize = screenHeight/45;
         cellTextColor = Color.BLACK;
+//        cellMargin =(int)((screenWidth*PERCENT_GRID_WEIGHT - NUM_OF_GRID_COLLUMN * cellWidth)/(NUM_OF_GRID_COLLUMN*2));
     }
 
     private void setupKeyboard()
@@ -59,7 +65,7 @@ public class LayoutUtils {
         keyboardHeight = cellHeight;
         keyboardWidth = cellWidth;
         keyboardTextColor = Color.WHITE;
-        keyboardMargin = 3;
+        keyboardMargin =(int)((screenWidth*PERCENT_KEYBOARD_WEIGHT - MAX_KEYBOARD_PER_ROW * keyboardWidth)/(MAX_KEYBOARD_PER_ROW*2));
     }
 
     public int getScreenWidth() {
@@ -112,5 +118,17 @@ public class LayoutUtils {
 
     public int getKeyboardMargin() {
         return keyboardMargin;
+    }
+
+    public int getCellMargin() {
+        return cellMargin;
+    }
+
+    public static float getPercentGridWeight() {
+        return PERCENT_GRID_WEIGHT;
+    }
+
+    public static float getPercentKeyboardWeight() {
+        return PERCENT_KEYBOARD_WEIGHT;
     }
 }
