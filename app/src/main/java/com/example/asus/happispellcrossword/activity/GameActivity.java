@@ -49,24 +49,13 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
     private static GridView gridView;
     //    public int PARENT_VERTICAL_MARGIN;
     private int LINE_HEIGHT;
-//    private int BTN_KEYBOARD_MARGIN_LEFT_AND_RIGHT;
-//    private int BTN_KEYBOARD_EDGE_SIZE;
-//    private int screenWidth = 0;
-//    private int screenHeight = 0;
-//    private TextView txtView_question;
-//    private ImageView imgView_question;
-//    private ImageButton del_btn;
     private String[][] gridViewData;
     private WordObjectsManager objManger = WordObjectsManager.getInstance();
     private GridviewAdapter adapter;
-//    private ImageButton btCheckAnswer;
-    //    private Button btSolve;
-//    private ImageButton btClear;
     private DisplayImageOptions opt;
     private ImageLoader imageLoader;
     private AdView mAdView;
     private ArrayList<WordObject> listQuestion;
-//    private ArrayList<Bitmap> listBitmapImageQuestion;
     private StaticVariable staticVariable;
     private int doneLevel;
     private int currentLevel=1;
@@ -81,8 +70,10 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
             R.id.bt_answer_P,R.id.bt_answer_Q,R.id.bt_answer_R,R.id.bt_answer_S,R.id.bt_answer_T,R.id.bt_answer_U,
             R.id.bt_answer_V,R.id.bt_answer_W,R.id.bt_answer_X,R.id.bt_answer_Y,R.id.bt_answer_Z};
     private DBHelper database;
-    private MediaPlayer mediaPlayer;
+    private MediaPlayer mediaPlayerBackground;
     private LayoutUtils layoutUtils;
+    private Button btSoundBackground;
+    private boolean isSoundBackgroundOn=true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,9 +111,9 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
     }
 
     private void playSoundBackroud(){
-//        mediaPlayer=MediaPlayer.create(GameActivity.this,R.raw.level_action);
-//        mediaPlayer.setLooping(true);
-//        mediaPlayer.setOnPreparedListener(this);
+        mediaPlayerBackground=MediaPlayer.create(GameActivity.this,R.raw.level_action);
+        mediaPlayerBackground.setLooping(true);
+        mediaPlayerBackground.setOnPreparedListener(this);
     }
 
     private void getdoneLevel() {
@@ -143,6 +134,24 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
             button.setOnTouchListener(new ChoiceTouchListener());
         }
         gridView.setOnDragListener(new ChoiceDragListener());
+        btSoundBackground.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeSoundSetup();
+            }
+        });
+    }
+
+    private void changeSoundSetup() {
+        if(isSoundBackgroundOn){
+            btSoundBackground.setBackgroundResource(R.drawable.ic_volume_off_black_48pt);
+            isSoundBackgroundOn=false;
+            mediaPlayerBackground.stop();
+        }else {
+            btSoundBackground.setBackgroundResource(R.drawable.ic_volume_up_black_48pt);
+            isSoundBackgroundOn=true;
+            mediaPlayerBackground.start();
+        }
     }
 
     private void setupKeyboard() {
@@ -156,6 +165,7 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
             button.setLayoutParams(paramLayoutButton);
             listKeyboard.add(button);
         }
+        btSoundBackground=(Button)findViewById(R.id.button_sound_main);
         /*btCheckAnswer=(Button)findViewById(R.id.btCheckAnswer);
         btCheckAnswer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -292,32 +302,13 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
     public void increaseLevel() {
         increaseCurrentLevel();
         //initializeQuestion();
-        if (!allLevelDone)
-            setupGridView();
+        setupGridView();
     }
 
     @Override
     public void notifyDoneQuestion() {
-//            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-//            alertDialogBuilder.setMessage("GO TO NEXT LEVEL");
-//
-//            alertDialogBuilder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-//                @Override
-//                public void onClick(DialogInterface arg0, int arg1) {
-//                    increaseLevel();
-//                }
-//            });
-//
-//            alertDialogBuilder.setNegativeButton("No",new DialogInterface.OnClickListener() {
-//                @Override
-//                public void onClick(DialogInterface dialog, int which) {
-//                    finish();
-//                }
-//            });
-//
-//            AlertDialog alertDialog = alertDialogBuilder.create();
-//            alertDialog.show();
-        SoundEffect.getInstance().playLevelDone(GameActivity.this,mediaPlayer);
+        updateTimeCompleteLevel(currentLevel);
+        SoundEffect.getInstance().playLevelDone(GameActivity.this,mediaPlayerBackground);
         final Dialog dialog=new Dialog(GameActivity.this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_next_level);
@@ -424,6 +415,20 @@ public class GameActivity extends Activity implements GridviewAdapter.ChangeLeve
             }
             return true;
         }
+    }
+    private void updateTimeCompleteLevel(int currentLevel) {
+//        Calendar calendar=Calendar.getInstance();
+//        int timestopLevel=calendar.get(Calendar.SECOND);
+        int timestopLevel = (int) (System.currentTimeMillis() / 1000);
+        timeCompleteLevel = timestopLevel - timeStartLevel;
+        staticVariable.getAllStage().get(currentLevel-1).setSecondComplete(timeCompleteLevel);
+        SharedPreferences pre = getSharedPreferences
+                (staticVariable.PREF_NAME, MODE_PRIVATE);
+        SharedPreferences.Editor editor = pre.edit();
+        editor.putInt(staticVariable.getAllStage().get(currentLevel-1).getDescriptionStage() + "", timeCompleteLevel);
+        editor.commit();
+        timeStartLevel = 0;
+        timeCompleteLevel = 0;
     }
 
     @Override

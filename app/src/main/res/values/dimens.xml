@@ -3,8 +3,8 @@
     <dimen name="activity_horizontal_margin">2dp</dimen>
     <dimen name="activity_vertical_margin">2dp</dimen>
     <dimen name="card_view_margin_bottom">50dp</dimen>
-    <dimen name="card_view_width">100dp</dimen>
-    <dimen name="card_view_height">80dp</dimen>
+    <dimen name="card_view_width">80dp</dimen>
+    <dimen name="card_view_height">100dp</dimen>
     <dimen name="card_view_corner">8dp</dimen>
     <dimen name="recycleview_stage_margin_left">50dp</dimen>
     <dimen name="recycleview_stage_margin_right">50dp</dimen>
@@ -19,5 +19,6 @@
     <dimen name="bt_level_margin_left">15dp</dimen>
     <dimen name="bt_level_margin_right">15dp</dimen>
     <dimen name="happi_spell_logo">80dp</dimen>
-    <dimen name="img_height">60dp</dimen>
+    <dimen name="img_height">80dp</dimen>
+    <dimen name="button_sound_size">40dp</dimen>
 </resources>

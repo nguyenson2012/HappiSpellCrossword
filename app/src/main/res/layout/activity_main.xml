@@ -2,8 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity"
+    tools:context=".MainActivity"
     android:background="@drawable/kid_cartoon_banner"
     android:orientation="horizontal">
     <LinearLayout
@@ -11,6 +10,12 @@
         android:layout_weight="1"
         android:layout_height="match_parent"
         android:orientation="vertical">
+        <Button
+            android:id="@+id/button_sound_main"
+            android:layout_width="@dimen/button_sound_size"
+            android:layout_height="@dimen/button_sound_size"
+            android:background="@drawable/ic_volume_up_black_48pt"
+            />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -119,6 +124,12 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:orientation="vertical">
+        <Button
+            android:layout_width="@dimen/button_sound_size"
+            android:layout_height="@dimen/button_sound_size"
+            android:background="@drawable/ic_volume_up_black_48pt"
+            android:visibility="invisible"
+            />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

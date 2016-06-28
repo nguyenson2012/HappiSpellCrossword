@@ -258,6 +258,7 @@ public class GridviewAdapter extends BaseAdapter {
                         if(checkAnswer&&positionX>=startX&&positionX<=(startX+answerQuestion.length())&&isQuestionAnimation[j]){
                             Animation animationScale = AnimationUtils.loadAnimation(context, R.anim.character_scale);
                             gridView.startAnimation(animationScale);
+                            textToSpeechUtil.speakWordOrSentence(wordObject.getResult().toLowerCase());
                             if(positionX==startX+answerQuestion.length()-1)
                                 isQuestionAnimation[j]=false;
                             if(checkResult()&&!isNotifyDoneLevel){
@@ -277,8 +278,10 @@ public class GridviewAdapter extends BaseAdapter {
                         if(checkAnswer&&positionY>=startY&&positionY<=(startY+answerQuestion.length())&&isQuestionAnimation[j]){
                             Animation animationScale = AnimationUtils.loadAnimation(context, R.anim.character_scale);
                             gridView.startAnimation(animationScale);
-                            if(positionY==startY+answerQuestion.length()-1)
-                                isQuestionAnimation[j]=false;
+                            if(positionY==startY+answerQuestion.length()-1) {
+                                isQuestionAnimation[j] = false;
+                                textToSpeechUtil.speakWordOrSentence(wordObject.getResult().toLowerCase());
+                            }
                             if(checkResult()&&!isNotifyDoneLevel){
                                 //changeLevelListener.increaseLevel();
                                 changeLevelListener.notifyDoneQuestion();
@@ -290,7 +293,7 @@ public class GridviewAdapter extends BaseAdapter {
                 }
             }else {
                     if(positionNewX==positionX&&positionNewY==positionY&&isAddnewButton){
-                        SoundEffect.getInstance().playWrongWord(context,mediaPlayer);
+                        SoundEffect.getInstance().playWrongWord(context, mediaPlayer);
                         isAddnewButton=false;
                     }
                 }

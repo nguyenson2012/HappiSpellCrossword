@@ -15,6 +15,9 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.asus.happispellcrossword.R;
 import com.example.asus.happispellcrossword.adapter.GridSpacingItemDecoration;
@@ -22,20 +25,29 @@ import com.example.asus.happispellcrossword.adapter.GridViewLevelAdapter;
 import com.example.asus.happispellcrossword.adapter.RecyclerItemClickListener;
 import com.example.asus.happispellcrossword.model.Stage;
 import com.example.asus.happispellcrossword.model.StaticVariable;
+import com.example.asus.happispellcrossword.model.WordObject;
 import com.example.asus.happispellcrossword.utils.DBHelper;
 import com.example.asus.happispellcrossword.utils.SoundEffect;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 /**
  * Created by Asus on 6/8/2016.
  */
-public class HomeActivity extends Activity {
+public class HomeActivity extends Activity implements MediaPlayer.OnPreparedListener{
     int column = 2;
     int spacing = 0;
     boolean includeEdge = false;
     GridViewLevelAdapter rcAdapter;
     private RecyclerView recyclerViewLevel;
+    private ImageView buttonSoundBackground,buttonInfo;
+    private boolean isSoundBackgroundOn=true;
     private ArrayList<Stage> stageItems;
     private LinearLayoutManager horizontalLayoutManager;
     private int screenWidth;
@@ -44,6 +56,7 @@ public class HomeActivity extends Activity {
     private StaticVariable staticVariable;
     private DBHelper databse;
     private MediaPlayer mediaPlayer;
+    private ArrayList<WordObject> listQuestion=new ArrayList<WordObject>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,14 +76,21 @@ public class HomeActivity extends Activity {
         playSoundBackGround();
     }
 
+    private void playSoundBackGround() {
+        mediaPlayer=MediaPlayer.create(HomeActivity.this,R.raw.happiness);
+        mediaPlayer.setLooping(true);
+        mediaPlayer.start();
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
-        playSoundBackGround();
     }
 
-    private void playSoundBackGround() {
-        SoundEffect.getInstance().playStartSound(HomeActivity.this, mediaPlayer);
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mediaPlayer.stop();
     }
 
     private void setupDatabse() {
@@ -82,14 +102,14 @@ public class HomeActivity extends Activity {
         SharedPreferences pre = getSharedPreferences
                 (StaticVariable.PREF_NAME, MODE_PRIVATE);
         SharedPreferences.Editor editor=pre.edit();
-        editor.putBoolean(StaticVariable.DATABASE,true);
+        editor.putBoolean(StaticVariable.DATABASE, true);
         editor.commit();
     }
 
     private boolean checkAlreadyDatabase(){
         SharedPreferences pre = getSharedPreferences
                 (StaticVariable.PREF_NAME, MODE_PRIVATE);
-        boolean alreadyDatabase=pre.getBoolean(StaticVariable.DATABASE,false);
+        boolean alreadyDatabase=pre.getBoolean(StaticVariable.DATABASE, false);
         return alreadyDatabase;
     }
 
@@ -100,6 +120,7 @@ public class HomeActivity extends Activity {
         getdoneLevel();
         rcAdapter.changeCurrentLevel(doneLevel);
         rcAdapter.notifyDataSetChanged();
+        playSoundBackGround();
     }
 
     private void getdoneLevel() {
@@ -152,6 +173,31 @@ public class HomeActivity extends Activity {
                     }
                 })
         );
+        buttonSoundBackground.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeSoundSetup();
+            }
+        });
+        buttonInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(HomeActivity.this,"This game created by EarlyEducation",Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void changeSoundSetup() {
+        if(isSoundBackgroundOn){
+            buttonSoundBackground.setImageResource(R.drawable.ic_volume_off_white_48pt);
+            isSoundBackgroundOn=false;
+            mediaPlayer.pause();
+
+        }else {
+            buttonSoundBackground.setImageResource(R.drawable.ic_volume_up_white_48pt);
+            isSoundBackgroundOn=true;
+            mediaPlayer.start();
+        }
     }
 
 
@@ -171,12 +217,59 @@ public class HomeActivity extends Activity {
     }
 
     private void setDefaultDataLevel() {
+        listQuestion=loadStageFromAssets();
         stageItems = StaticVariable.getInstance().getAllStage();
-
     }
 
     private void setUpView() {
         recyclerViewLevel = (RecyclerView) findViewById(R.id.recyclerview_stage);
+        buttonSoundBackground=(ImageView)findViewById(R.id.ic_volume_start);
+        buttonInfo=(ImageView)findViewById(R.id.ic_info_start);
+
+    }
+
+    public ArrayList<WordObject> loadStageFromAssets(){
+        ArrayList<WordObject>listQuestion=new ArrayList<WordObject>();
+        String json = null;
+        try {
+            InputStream is = getAssets().open("stage1.json");
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        try {
+            JSONObject obj = new JSONObject(json);
+            JSONArray m_jArry = obj.getJSONArray("1");
+
+            for (int i = 0; i < m_jArry.length(); i++) {
+                JSONObject jo_inside = m_jArry.getJSONObject(i);
+                WordObject wordObject = new WordObject();
+                wordObject.setStagePosition((int)jo_inside.getInt("stagePosition"));
+                wordObject.startX=(int)jo_inside.getInt("startX");
+                wordObject.startY=(int)jo_inside.getInt("startY");
+                wordObject.setQuestion(jo_inside.getString("question"));
+                wordObject.setResult(jo_inside.getString("result"));
+                wordObject.setOrientation((int) jo_inside.getInt("orientation"));
+                wordObject.setImageLink(jo_inside.getString("imageLink"));
+                wordObject.setPosition((int)jo_inside.getInt("positionQuestion"));
+
+                //Add your values in your `ArrayList` as below:
+                listQuestion.add(wordObject);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return listQuestion;
+    }
+
+    @Override
+    public void onPrepared(MediaPlayer mp) {
+        mp.start();
     }
 }
 
